@@ -1,7 +1,0 @@
-description: "Get Expenses V1 Response"
-type: object
-properties:
-  expenses:
-    type: array
-    items:
-      $ref: '../components/ExpenseV1.yaml'

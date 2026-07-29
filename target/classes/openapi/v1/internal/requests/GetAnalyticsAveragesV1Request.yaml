@@ -1,9 +1,0 @@
-description: "Get Analytics Averages V1 Request"
-type: object
-required:
-  - referenceDate
-properties:
-  referenceDate:
-    type: string
-    format: date
-    description: "Reference date for averages calculation"

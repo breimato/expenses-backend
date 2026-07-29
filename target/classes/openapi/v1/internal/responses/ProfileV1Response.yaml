@@ -1,5 +1,0 @@
-description: "Profile V1 Response"
-type: object
-properties:
-  profile:
-    $ref: '../components/ProfileV1.yaml'

@@ -1,5 +1,0 @@
-description: "Get Analytics Projections V1 Response"
-type: object
-properties:
-  analyticsProjections:
-    $ref: '../components/AnalyticsProjectionsV1.yaml'

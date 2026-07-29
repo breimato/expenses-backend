@@ -1,5 +1,0 @@
-description: "Recurring frequency V1"
-type: string
-enum:
-  - MANUAL
-  - MONTHLY

@@ -1,5 +1,0 @@
-description: "Movement type V1"
-type: string
-enum:
-  - EXPENSE
-  - INCOME

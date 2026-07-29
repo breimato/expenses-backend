@@ -1,5 +1,0 @@
-description: "Get Analytics Averages V1 Response"
-type: object
-properties:
-  analyticsAverages:
-    $ref: '../components/AnalyticsAveragesV1.yaml'

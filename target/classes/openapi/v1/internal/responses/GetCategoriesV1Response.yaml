@@ -1,7 +1,0 @@
-description: "Get Categories V1 Response"
-type: object
-properties:
-  categories:
-    type: array
-    items:
-      $ref: '../components/CategoryV1.yaml'

@@ -1,5 +1,0 @@
-description: "Expense V1 Response"
-type: object
-properties:
-  expense:
-    $ref: '../components/ExpenseV1.yaml'
