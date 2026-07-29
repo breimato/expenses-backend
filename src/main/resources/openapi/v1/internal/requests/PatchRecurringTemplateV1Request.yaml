@@ -1,0 +1,36 @@
+description: "Patch Recurring Template V1 Request"
+type: object
+properties:
+  label:
+    type: string
+    description: "Template label"
+  amount:
+    type: string
+    description: "Template amount as decimal string"
+  categoryId:
+    type: integer
+    format: int32
+    description: "Category identifier"
+  sortOrder:
+    type: integer
+    format: int32
+    description: "Display sort order"
+  movementType:
+    $ref: '../components/MovementTypeV1.yaml'
+    description: "Movement direction"
+  offsetsSpendingAverage:
+    type: boolean
+    description: "For income templates: reduces net spending in analytics averages"
+  frequency:
+    $ref: '../components/RecurringFrequencyV1.yaml'
+    description: "Application frequency"
+  dayOfMonth:
+    type: integer
+    format: int32
+    description: "Day of month for monthly auto-apply (1-31)"
+  autoApply:
+    type: boolean
+    description: "Whether to auto-apply on schedule"
+  enabled:
+    type: boolean
+    description: "Whether the template is active"

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bd8c83d4-7447-4b71-a6b0-23010c75fe87" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expenses.iml" beforeDir="false" afterPath="$PROJECT_DIR$/expenses.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/ExpensesApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/ExpensesApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/controller/GetAnalyticsAveragesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/controller/GetAnalyticsAveragesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/controller/GetAnalyticsProjectionsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/controller/GetAnalyticsProjectionsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/repository/AnalyticsRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/repository/AnalyticsRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/service/AnalyticsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/analytics/service/AnalyticsService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/controller/GetCategoriesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/controller/GetCategoriesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/controller/PatchCategoryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/controller/PatchCategoryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/entity/CategoryEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/entity/CategoryEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/mapper/CategoryResponseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/mapper/CategoryResponseMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/mapper/PostCategoryRequestMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/mapper/PostCategoryRequestMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/repository/CategoryJpaMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/repository/CategoryJpaMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/category/repository/CategoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/category/repository/CategoryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/common/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/common/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/common/JsonNullableMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/common/JsonNullableMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/common/exception/CategoryException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/common/exception/CategoryException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/common/exception/constants/ExceptionMessageConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/common/exception/constants/ExceptionMessageConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/expense/controller/GetExpensesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/expense/controller/GetExpensesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/expense/entity/ExpenseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/expense/entity/ExpenseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/expense/mapper/ExpenseResponseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/expense/mapper/ExpenseResponseMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/expense/mapper/PostExpenseRequestMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/expense/mapper/PostExpenseRequestMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/expense/repository/ExpenseJpaMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/expense/repository/ExpenseJpaMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/expense/repository/ExpenseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/expense/repository/ExpenseRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/profile/controller/GetProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/profile/controller/GetProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/profile/controller/PatchProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/profile/controller/PatchProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/profile/repository/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/profile/repository/ProfileRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/controller/GetRecurringTemplatesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/controller/GetRecurringTemplatesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/entity/RecurringTemplateEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/entity/RecurringTemplateEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/mapper/PostRecurringTemplateRequestMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/mapper/PostRecurringTemplateRequestMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/mapper/RecurringTemplateResponseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/mapper/RecurringTemplateResponseMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/repository/RecurringTemplateJpaMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/repository/RecurringTemplateJpaMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/repository/RecurringTemplateRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/expenses/recurring/repository/RecurringTemplateRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/AnalyticsAveragesV1.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/AnalyticsAveragesV1.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/CategoryV1.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/CategoryV1.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/ExpenseV1.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/ExpenseV1.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/ProfileV1.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/ProfileV1.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/RecurringTemplateV1.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/components/RecurringTemplateV1.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/es-expenses.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/es-expenses.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/analytics-averages-v1.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/analytics-averages-v1.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/analytics-projections-v1.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/analytics-projections-v1.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/categories-v1.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/categories-v1.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/expenses-v1.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/expenses-v1.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/recurring-templates-id-quick-add-v1.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/recurring-templates-id-quick-add-v1.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/recurring-templates-v1.api.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/expenses/recurring-templates-v1.api.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/GetCategoriesV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/GetCategoriesV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/GetExpensesV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/GetExpensesV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchCategoryV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchCategoryV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchExpenseV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchExpenseV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchProfileV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchProfileV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchRecurringTemplateV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PatchRecurringTemplateV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PostCategoryV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PostCategoryV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PostExpenseV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PostExpenseV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PostRecurringTemplateV1Request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/openapi/v1/internal/requests/PostRecurringTemplateV1Request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="3HAg47tQAnAL140sUVM8zYgbgj4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Breixo/Desktop/Escritorio/Proyectos/expenses/mobile-app"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bd8c83d4-7447-4b71-a6b0-23010c75fe87" name="Changes" comment="" />
+      <created>1785316092947</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1785316092947</updated>
+    </task>
+    <servers />
+  </component>
+</project>

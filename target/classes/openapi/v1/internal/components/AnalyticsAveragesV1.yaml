@@ -1,0 +1,15 @@
+description: "Analytics Averages V1"
+type: object
+properties:
+  dailyAverage:
+    type: string
+    description: "Daily average net spending for the current month (from day 1)"
+  weeklyAverage:
+    type: string
+    description: "Weekly average expense as decimal string"
+  monthlyAverage:
+    type: string
+    description: "Monthly average expense as decimal string"
+  yearlyAverage:
+    type: string
+    description: "Yearly average expense as decimal string"

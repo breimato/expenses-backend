@@ -1,0 +1,115 @@
+openapi: 3.0.3
+info:
+  title: es-expenses-api
+  version: 1.0.0
+  description: Expenses service API
+
+paths:
+  # Categories
+  /v1/expenses/categories:
+    $ref: './expenses/categories-v1.api.yaml'
+  /v1/expenses/categories/{id}:
+    $ref: './expenses/categories-id-v1.api.yaml'
+  # Expenses
+  /v1/expenses/expenses:
+    $ref: './expenses/expenses-v1.api.yaml'
+  /v1/expenses/expenses/{id}:
+    $ref: './expenses/expenses-id-v1.api.yaml'
+  # Recurring Templates
+  /v1/expenses/recurring-templates:
+    $ref: './expenses/recurring-templates-v1.api.yaml'
+  /v1/expenses/recurring-templates/{id}:
+    $ref: './expenses/recurring-templates-id-v1.api.yaml'
+  /v1/expenses/recurring-templates/{id}/applications:
+    $ref: './expenses/recurring-templates-id-quick-add-v1.api.yaml'
+  /v1/expenses/recurring-applications:
+    $ref: './expenses/recurring-templates-apply-pending-v1.api.yaml'
+  # Profile
+  /v1/expenses/profile:
+    $ref: './expenses/profile-v1.api.yaml'
+  # Analytics
+  /v1/expenses/analytics/averages:
+    $ref: './expenses/analytics-averages-v1.api.yaml'
+  /v1/expenses/analytics/projections:
+    $ref: './expenses/analytics-projections-v1.api.yaml'
+
+components:
+  schemas:
+    ApiError:
+      $ref: './components/ApiErrorV1.yaml'
+    CategoryV1:
+      $ref: './components/CategoryV1.yaml'
+    ExpenseV1:
+      $ref: './components/ExpenseV1.yaml'
+    RecurringTemplateV1:
+      $ref: './components/RecurringTemplateV1.yaml'
+    ProfileV1:
+      $ref: './components/ProfileV1.yaml'
+    AnalyticsAveragesV1:
+      $ref: './components/AnalyticsAveragesV1.yaml'
+    AnalyticsProjectionsV1:
+      $ref: './components/AnalyticsProjectionsV1.yaml'
+    PostCategoryV1Request:
+      $ref: './requests/PostCategoryV1Request.yaml'
+    PatchCategoryV1Request:
+      $ref: './requests/PatchCategoryV1Request.yaml'
+    PostExpenseV1Request:
+      $ref: './requests/PostExpenseV1Request.yaml'
+    PatchExpenseV1Request:
+      $ref: './requests/PatchExpenseV1Request.yaml'
+    PostRecurringTemplateV1Request:
+      $ref: './requests/PostRecurringTemplateV1Request.yaml'
+    PatchRecurringTemplateV1Request:
+      $ref: './requests/PatchRecurringTemplateV1Request.yaml'
+    PostRecurringTemplateQuickAddV1Request:
+      $ref: './requests/PostRecurringTemplateQuickAddV1Request.yaml'
+    PatchProfileV1Request:
+      $ref: './requests/PatchProfileV1Request.yaml'
+    GetAnalyticsAveragesV1Request:
+      $ref: './requests/GetAnalyticsAveragesV1Request.yaml'
+    GetAnalyticsProjectionsV1Request:
+      $ref: './requests/GetAnalyticsProjectionsV1Request.yaml'
+    CategoryV1Response:
+      $ref: './responses/CategoryV1Response.yaml'
+    GetCategoriesV1Response:
+      $ref: './responses/GetCategoriesV1Response.yaml'
+    ExpenseV1Response:
+      $ref: './responses/ExpenseV1Response.yaml'
+    GetExpensesV1Response:
+      $ref: './responses/GetExpensesV1Response.yaml'
+    RecurringTemplateV1Response:
+      $ref: './responses/RecurringTemplateV1Response.yaml'
+    GetRecurringTemplatesV1Response:
+      $ref: './responses/GetRecurringTemplatesV1Response.yaml'
+    ProfileV1Response:
+      $ref: './responses/ProfileV1Response.yaml'
+    GetAnalyticsAveragesV1Response:
+      $ref: './responses/GetAnalyticsAveragesV1Response.yaml'
+    GetAnalyticsProjectionsV1Response:
+      $ref: './responses/GetAnalyticsProjectionsV1Response.yaml'
+    PostRecurringTemplatesApplyPendingV1Response:
+      $ref: './responses/PostRecurringTemplatesApplyPendingV1Response.yaml'
+    MovementTypeV1:
+      $ref: './components/MovementTypeV1.yaml'
+    RecurringFrequencyV1:
+      $ref: './components/RecurringFrequencyV1.yaml'
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'

@@ -1,0 +1,5 @@
+description: "Category V1 Response"
+type: object
+properties:
+  category:
+    $ref: '../components/CategoryV1.yaml'

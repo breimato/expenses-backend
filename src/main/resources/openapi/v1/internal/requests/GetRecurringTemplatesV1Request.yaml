@@ -1,0 +1,7 @@
+description: "Get Recurring Templates V1 Request"
+type: object
+properties:
+  categoryId:
+    type: integer
+    format: int32
+    description: "Filter by category identifier"

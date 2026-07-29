@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ExpensesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="expenses" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.expenses.ExpensesApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

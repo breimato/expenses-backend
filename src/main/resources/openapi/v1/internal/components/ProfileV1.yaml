@@ -1,0 +1,9 @@
+description: "Profile V1"
+type: object
+properties:
+  displayName:
+    type: string
+    description: "Display name"
+  balance:
+    type: string
+    description: "Computed account balance from all recorded movements as decimal string"

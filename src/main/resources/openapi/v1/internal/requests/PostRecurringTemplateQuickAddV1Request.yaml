@@ -1,0 +1,10 @@
+description: "Post Recurring Template Quick Add V1 Request"
+type: object
+properties:
+  expenseDate:
+    type: string
+    format: date
+    description: "Override expense date"
+  amount:
+    type: string
+    description: "Override expense amount as decimal string"

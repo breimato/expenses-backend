@@ -1,0 +1,7 @@
+description: "Get Recurring Templates V1 Response"
+type: object
+properties:
+  recurringTemplates:
+    type: array
+    items:
+      $ref: '../components/RecurringTemplateV1.yaml'

@@ -1,0 +1,20 @@
+description: "Patch Category V1 Request"
+type: object
+properties:
+  name:
+    type: string
+    description: "Category name"
+  color:
+    type: string
+    description: "Category color in hex format"
+  icon:
+    type: string
+    description: "Category icon"
+    nullable: true
+  sortOrder:
+    type: integer
+    format: int32
+    description: "Display sort order"
+  movementType:
+    $ref: '../components/MovementTypeV1.yaml'
+    description: "Category applies to expenses or incomes"

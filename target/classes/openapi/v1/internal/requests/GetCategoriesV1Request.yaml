@@ -1,0 +1,13 @@
+description: "Get Categories V1 Request"
+type: object
+properties:
+  id:
+    type: integer
+    format: int32
+    description: "Filter by identifier"
+  name:
+    type: string
+    description: "Filter by name"
+  movementType:
+    $ref: '../components/MovementTypeV1.yaml'
+    description: "Filter by movement type"

@@ -1,0 +1,6 @@
+description: "Patch Profile V1 Request"
+type: object
+properties:
+  displayName:
+    type: string
+    description: "User display name"

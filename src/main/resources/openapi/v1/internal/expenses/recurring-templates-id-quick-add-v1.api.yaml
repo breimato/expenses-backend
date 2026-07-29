@@ -1,0 +1,39 @@
+post:
+  summary: "Post Recurring Template Application V1"
+  description: "Create an expense application from a recurring template"
+  operationId: "PostRecurringTemplateQuickAddV1"
+  tags:
+    - recurring-template-applications-v1
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+      description: "Recurring template identifier"
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/PostRecurringTemplateQuickAddV1Request.yaml'
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/ExpenseV1Response.yaml'
+    '404':
+      description: "Not Found - Recurring template not found"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

@@ -1,0 +1,51 @@
+get:
+  summary: "Get Recurring Templates V1"
+  description: "Get all recurring templates, optionally filtered by search criteria"
+  operationId: "GetRecurringTemplatesV1"
+  tags:
+    - get-recurring-templates-v1
+  parameters:
+    - name: categoryId
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/GetRecurringTemplatesV1Response.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+post:
+  summary: "Post Recurring Template V1"
+  description: "Create a new recurring template"
+  operationId: "PostRecurringTemplateV1"
+  tags:
+    - post-recurring-template-v1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/PostRecurringTemplateV1Request.yaml'
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/RecurringTemplateV1Response.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

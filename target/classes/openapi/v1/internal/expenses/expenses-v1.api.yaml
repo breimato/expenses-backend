@@ -1,0 +1,67 @@
+get:
+  summary: "Get Expenses V1"
+  description: "Get all expenses, optionally filtered by search criteria"
+  operationId: "GetExpensesV1"
+  tags:
+    - get-expenses-v1
+  parameters:
+    - name: categoryId
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    - name: expenseDate
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+    - name: description
+      in: query
+      required: false
+      schema:
+        type: string
+    - name: movementType
+      in: query
+      required: false
+      schema:
+        $ref: '../components/MovementTypeV1.yaml'
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/GetExpensesV1Response.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+post:
+  summary: "Post Expense V1"
+  description: "Create a new expense"
+  operationId: "PostExpenseV1"
+  tags:
+    - post-expense-v1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/PostExpenseV1Request.yaml'
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/ExpenseV1Response.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

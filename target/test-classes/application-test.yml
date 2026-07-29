@@ -1,0 +1,7 @@
+spring:
+  flyway:
+    enabled: true
+
+expenses:
+  recurring:
+    apply-on-startup: false

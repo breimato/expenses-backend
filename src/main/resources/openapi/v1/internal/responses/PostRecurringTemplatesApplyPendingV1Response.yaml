@@ -1,0 +1,9 @@
+description: "Post Recurring Templates Apply Pending V1 Response"
+type: object
+required:
+  - appliedCount
+properties:
+  appliedCount:
+    type: integer
+    format: int32
+    description: "Number of recurring templates applied"
