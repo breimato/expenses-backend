@@ -19,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AnalyticsService {
 
-    private static final int WEEKLY_WINDOW_WEEKS = 12;
-    private static final int MONTHLY_WINDOW_MONTHS = 12;
     private static final int MONEY_SCALE = 2;
     private static final int CALCULATION_SCALE = 10;
 
@@ -28,7 +26,7 @@ public class AnalyticsService {
     private final AnalyticsRepository analyticsRepository;
 
     /**
-     * Compute expense averages for rolling windows ending on the reference date.
+     * Compute daily average net spending for the current month ending on the reference date.
      *
      * @param referenceDate the reference date
      * @return the analytics averages result
@@ -40,22 +38,8 @@ public class AnalyticsService {
         final var mtdTotal = this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate);
         final var daysElapsed = referenceDate.getDayOfMonth();
 
-        final var weeklyTotal = this.analyticsRepository.sumNetSpendingByDateRange(
-                referenceDate.minusDays((long) WEEKLY_WINDOW_WEEKS * 7 - 1), referenceDate);
-
-        final var monthlyFrom = referenceDate.minusMonths(MONTHLY_WINDOW_MONTHS).plusDays(1);
-        final var monthlyTotal = this.analyticsRepository.sumNetSpendingByDateRange(monthlyFrom, referenceDate);
-
-        final var yearlyFrom = referenceDate.withDayOfYear(1);
-        final var yearlyTotal = this.analyticsRepository.sumNetSpendingByDateRange(yearlyFrom, referenceDate);
-
-        final var monthsElapsedInYear = referenceDate.getMonthValue();
-
         return AnalyticsAveragesResult.builder()
                 .dailyAverage(this.divide(mtdTotal, daysElapsed))
-                .weeklyAverage(this.divide(weeklyTotal, WEEKLY_WINDOW_WEEKS))
-                .monthlyAverage(this.divide(monthlyTotal, MONTHLY_WINDOW_MONTHS))
-                .yearlyAverage(this.divide(yearlyTotal, monthsElapsedInYear))
                 .build();
     }
 

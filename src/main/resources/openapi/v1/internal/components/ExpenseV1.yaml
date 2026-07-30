@@ -24,7 +24,9 @@ properties:
     description: "Movement direction"
   offsetsSpendingAverage:
     type: boolean
-    description: "For incomes: reduces net spending in analytics averages"
+    description: >-
+      Incomes: reduces net spending in analytics averages (e.g. reimbursements).
+      Expenses: excludes the amount from analytics averages (e.g. savings/investments).
   createdAt:
     type: string
     format: date-time

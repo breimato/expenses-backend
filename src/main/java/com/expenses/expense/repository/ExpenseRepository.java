@@ -83,10 +83,10 @@ public class ExpenseRepository {
         this.ensureCategoryMatchesMovement(postExpenseV1RequestDto.getCategoryId(), movementType);
         final var expenseEntity = this.postExpenseRequestMapper.toExpenseEntity(postExpenseV1RequestDto);
         expenseEntity.setMovementType(movementType);
-        if (movementType == MovementType.EXPENSE) {
+        if (Objects.isNull(postExpenseV1RequestDto.getOffsetsSpendingAverage())) {
             expenseEntity.setOffsetsSpendingAverage(false);
-        } else if (Objects.isNull(postExpenseV1RequestDto.getOffsetsSpendingAverage())) {
-            expenseEntity.setOffsetsSpendingAverage(false);
+        } else {
+            expenseEntity.setOffsetsSpendingAverage(postExpenseV1RequestDto.getOffsetsSpendingAverage());
         }
         final var savedExpenseEntity = this.expenseJpaMapper.save(expenseEntity);
         return savedExpenseEntity;
@@ -116,9 +116,6 @@ public class ExpenseRepository {
         this.patchExpenseRequestMapper.updateExpenseEntity(patchExpenseV1RequestDto, expenseEntity);
         if (Objects.nonNull(patchExpenseV1RequestDto.getMovementType())) {
             expenseEntity.setMovementType(this.enumMapper.toMovementType(patchExpenseV1RequestDto.getMovementType()));
-        }
-        if (expenseEntity.getMovementType() == MovementType.EXPENSE) {
-            expenseEntity.setOffsetsSpendingAverage(false);
         }
         final var savedExpenseEntity = this.expenseJpaMapper.save(expenseEntity);
         return savedExpenseEntity;

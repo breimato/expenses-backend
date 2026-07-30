@@ -53,7 +53,10 @@ public class ExpenseEntity {
     @Column(name = "movement_type", nullable = false, length = 10)
     private MovementType movementType = MovementType.EXPENSE;
 
-    /** Whether income offsets spending in analytics averages. */
+    /**
+     * Analytics average flag: incomes reduce net spending; expenses are excluded from net spending
+     * (e.g. savings/investments that leave the bank but are not consumption).
+     */
     @Column(name = "offsets_spending_average", nullable = false)
     private boolean offsetsSpendingAverage;
 

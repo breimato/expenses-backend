@@ -124,4 +124,24 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.analyticsProjections").exists());
     }
+
+    /** Test expense excluded from averages can be created with the flag. */
+    @Test
+    void createExpenseExcludedFromAveragePersistsFlag() throws Exception {
+
+        this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": 1,
+                                  "amount": "1000.00",
+                                  "description": "Savings transfer",
+                                  "expenseDate": "2026-07-05",
+                                  "movementType": "EXPENSE",
+                                  "offsetsSpendingAverage": true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.expense.offsetsSpendingAverage").value(true));
+    }
 }

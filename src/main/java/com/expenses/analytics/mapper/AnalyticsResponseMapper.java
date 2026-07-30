@@ -22,9 +22,6 @@ public interface AnalyticsResponseMapper {
      * @return the analytics averages v1 dto
      */
     @Mapping(target = "dailyAverage", source = "dailyAverage")
-    @Mapping(target = "weeklyAverage", source = "weeklyAverage")
-    @Mapping(target = "monthlyAverage", source = "monthlyAverage")
-    @Mapping(target = "yearlyAverage", source = "yearlyAverage")
     AnalyticsAveragesV1Dto toAnalyticsAveragesV1Dto(AnalyticsAveragesResult analyticsAveragesResult);
 
     /**

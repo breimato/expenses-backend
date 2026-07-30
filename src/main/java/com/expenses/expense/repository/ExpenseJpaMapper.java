@@ -23,7 +23,8 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
     @Query("""
             SELECT COALESCE(SUM(
                 CASE
-                    WHEN expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE THEN expenseEntity.amount
+                    WHEN expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE
+                         AND expenseEntity.offsetsSpendingAverage = false THEN expenseEntity.amount
                     WHEN expenseEntity.movementType = com.expenses.common.MovementType.INCOME
                          AND expenseEntity.offsetsSpendingAverage = true THEN -expenseEntity.amount
                     ELSE 0

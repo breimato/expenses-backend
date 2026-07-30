@@ -20,7 +20,9 @@ properties:
     description: "Movement direction"
   offsetsSpendingAverage:
     type: boolean
-    description: "For income templates: reduces net spending in analytics averages"
+    description: >-
+      Income templates: reduces net spending in analytics averages.
+      Expense templates: excludes the amount from analytics averages (e.g. savings/investments).
   frequency:
     $ref: '../components/RecurringFrequencyV1.yaml'
     description: "Application frequency"
