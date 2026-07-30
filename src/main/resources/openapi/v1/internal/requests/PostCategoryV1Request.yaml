@@ -14,10 +14,6 @@ properties:
     type: string
     description: "Category icon"
     nullable: true
-  sortOrder:
-    type: integer
-    format: int32
-    description: "Display sort order"
   movementType:
     $ref: '../components/MovementTypeV1.yaml'
     description: "Category applies to expenses or incomes"

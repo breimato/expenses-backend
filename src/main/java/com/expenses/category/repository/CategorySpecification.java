@@ -45,7 +45,7 @@ public final class CategorySpecification {
             }
 
             query.orderBy(
-                    criteriaBuilder.asc(root.get("sortOrder")),
+                    criteriaBuilder.asc(root.get("name")),
                     criteriaBuilder.asc(root.get("id")));
 
             if (predicates.isEmpty()) {

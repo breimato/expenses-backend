@@ -42,10 +42,6 @@ public class CategoryEntity {
     @Column(length = 20)
     private String icon;
 
-    /** The sort order. */
-    @Column(name = "sort_order", nullable = false)
-    private Integer sortOrder;
-
     /** The movement type. */
     @Enumerated(EnumType.STRING)
     @Column(name = "movement_type", nullable = false, length = 10)

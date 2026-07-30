@@ -11,10 +11,6 @@ properties:
     type: integer
     format: int32
     description: "Category identifier"
-  sortOrder:
-    type: integer
-    format: int32
-    description: "Display sort order"
   movementType:
     $ref: '../components/MovementTypeV1.yaml'
     description: "Movement direction"

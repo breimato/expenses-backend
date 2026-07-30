@@ -44,10 +44,6 @@ public class RecurringTemplateEntity {
     @Column(name = "category_id", nullable = false)
     private Integer categoryId;
 
-    /** The sort order. */
-    @Column(name = "sort_order", nullable = false)
-    private Integer sortOrder;
-
     /** The last used at. */
     @Column(name = "last_used_at")
     private LocalDateTime lastUsedAt;

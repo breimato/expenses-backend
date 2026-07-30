@@ -3,13 +3,13 @@ package com.expenses.category.repository;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.expenses.api.dto.MovementTypeV1;
 import com.expenses.api.dto.PatchCategoryV1RequestDto;
 import com.expenses.api.dto.PostCategoryV1RequestDto;
-
 import com.expenses.category.entity.CategoryEntity;
 import com.expenses.category.mapper.PatchCategoryRequestMapper;
 import com.expenses.category.mapper.PostCategoryRequestMapper;
@@ -20,7 +20,6 @@ import com.expenses.expense.repository.ExpenseJpaMapper;
 import com.expenses.recurring.repository.RecurringTemplateJpaMapper;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 /** The Class Category Repository. */
 @Component
@@ -73,7 +72,6 @@ public class CategoryRepository {
         if (Objects.nonNull(postCategoryV1RequestDto.getMovementType())) {
             categoryEntity.setMovementType(this.enumMapper.toMovementType(postCategoryV1RequestDto.getMovementType()));
         }
-        this.shiftIfNeeded(categoryEntity.getMovementType(), categoryEntity.getSortOrder(), null);
         return this.categoryJpaMapper.save(categoryEntity);
     }
 
@@ -88,12 +86,10 @@ public class CategoryRepository {
     public CategoryEntity update(final Integer id, final PatchCategoryV1RequestDto patchCategoryV1RequestDto) {
 
         final var categoryEntity = this.findById(id);
-        final var oldSortOrder = categoryEntity.getSortOrder();
         this.patchCategoryRequestMapper.updateCategoryEntity(patchCategoryV1RequestDto, categoryEntity);
         if (Objects.nonNull(patchCategoryV1RequestDto.getMovementType())) {
             categoryEntity.setMovementType(this.enumMapper.toMovementType(patchCategoryV1RequestDto.getMovementType()));
         }
-        this.shiftIfNeeded(categoryEntity.getMovementType(), categoryEntity.getSortOrder(), id);
         return this.categoryJpaMapper.save(categoryEntity);
     }
 
@@ -135,32 +131,5 @@ public class CategoryRepository {
     public boolean existsById(final Integer id) {
 
         return this.categoryJpaMapper.existsById(id);
-    }
-
-    /**
-     * If the target sortOrder is already taken by another category of the same
-     * movement type, shift all categories at that position and above up by one.
-     *
-     * @param movementType the movement type scope
-     * @param sortOrder    the desired position
-     * @param excludeId    the id to exclude from the collision check (the category being edited), or null
-     */
-    private void shiftIfNeeded(final com.expenses.common.MovementType movementType,
-                               final Integer sortOrder,
-                               final Integer excludeId) {
-
-        if (Objects.isNull(sortOrder) || Objects.isNull(movementType)) {
-            return;
-        }
-
-        final boolean collision = this.categoryJpaMapper.findAll(
-                CategorySpecification.withFilters(null, null, movementType))
-                .stream()
-                .anyMatch(c -> sortOrder.equals(c.getSortOrder())
-                        && (excludeId == null || !excludeId.equals(c.getId())));
-
-        if (collision) {
-            this.categoryJpaMapper.shiftSortOrdersUp(movementType, sortOrder);
-        }
     }
 }

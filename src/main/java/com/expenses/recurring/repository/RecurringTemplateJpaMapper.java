@@ -21,7 +21,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
     @Query("""
             SELECT recurringTemplateEntity FROM RecurringTemplateEntity recurringTemplateEntity
             WHERE (:categoryId IS NULL OR recurringTemplateEntity.categoryId = :categoryId)
-            ORDER BY recurringTemplateEntity.sortOrder ASC, recurringTemplateEntity.id ASC
+            ORDER BY recurringTemplateEntity.id ASC
             """)
     List<RecurringTemplateEntity> findByCriteria(@Param("categoryId") Integer categoryId);
 
@@ -38,7 +38,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
               AND recurringTemplateEntity.frequency = :frequency
               AND recurringTemplateEntity.dayOfMonth IS NOT NULL
               AND recurringTemplateEntity.dayOfMonth <= :dayOfMonth
-            ORDER BY recurringTemplateEntity.sortOrder ASC, recurringTemplateEntity.id ASC
+            ORDER BY recurringTemplateEntity.id ASC
             """)
     List<RecurringTemplateEntity> findDueAutoApplyTemplates(
             @Param("frequency") RecurringFrequency frequency,

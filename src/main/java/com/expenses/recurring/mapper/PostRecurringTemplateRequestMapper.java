@@ -28,6 +28,5 @@ public interface PostRecurringTemplateRequestMapper {
     @Mapping(target = "dayOfMonth", ignore = true)
     @Mapping(target = "autoApply", ignore = true)
     @Mapping(target = "enabled", ignore = true)
-    @Mapping(target = "sortOrder", defaultExpression = "java(postRecurringTemplateV1RequestDto.getSortOrder() != null ? postRecurringTemplateV1RequestDto.getSortOrder() : 0)")
     RecurringTemplateEntity toRecurringTemplateEntity(PostRecurringTemplateV1RequestDto postRecurringTemplateV1RequestDto);
 }

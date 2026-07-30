@@ -23,6 +23,5 @@ public interface PostCategoryRequestMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "movementType", ignore = true)
     @Mapping(target = "icon", source = "icon", qualifiedByName = "unmapString")
-    @Mapping(target = "sortOrder", defaultExpression = "java(postCategoryV1RequestDto.getSortOrder() != null ? postCategoryV1RequestDto.getSortOrder() : 0)")
     CategoryEntity toCategoryEntity(PostCategoryV1RequestDto postCategoryV1RequestDto);
 }
