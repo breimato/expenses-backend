@@ -32,6 +32,10 @@ public class ExpenseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /** The user id. */
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
+
     /** The category id. */
     @Column(name = "category_id", nullable = false)
     private Integer categoryId;

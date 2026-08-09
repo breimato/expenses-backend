@@ -32,6 +32,10 @@ public class RecurringTemplateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /** The user id. */
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
+
     /** The label. */
     @Column(nullable = false, length = 100)
     private String label;

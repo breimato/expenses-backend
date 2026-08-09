@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.expenses.api.dto.PatchProfileV1RequestDto;
-
+import com.expenses.auth.service.CurrentUserService;
 import com.expenses.common.exception.ProfileException;
 import com.expenses.common.exception.constants.ExceptionMessageConstants;
 import com.expenses.expense.repository.ExpenseJpaMapper;
@@ -27,20 +27,23 @@ public class ProfileRepository {
     /** The patch profile request mapper. */
     private final PatchProfileRequestMapper patchProfileRequestMapper;
 
+    /** The current user service. */
+    private final CurrentUserService currentUserService;
+
     /**
-     * Get singleton profile.
+     * Get profile for current user.
      *
      * @return the profile entity
      */
     @Transactional(readOnly = true)
     public ProfileEntity getProfile() {
 
-        return this.profileJpaMapper.findById(ProfileEntity.SINGLETON_ID)
+        return this.profileJpaMapper.findByUserId(this.currentUserService.getRequiredUserId())
                 .orElseThrow(() -> new ProfileException(ExceptionMessageConstants.PROFILE_NOT_FOUND));
     }
 
     /**
-     * Update singleton profile.
+     * Update profile for current user.
      *
      * @param patchProfileV1RequestDto the patch profile v1 request dto
      * @return the profile entity
@@ -54,13 +57,13 @@ public class ProfileRepository {
     }
 
     /**
-     * Get balance computed from all recorded movements.
+     * Get balance computed from all recorded movements for current user.
      *
      * @return the balance
      */
     @Transactional(readOnly = true)
     public java.math.BigDecimal getBalance() {
 
-        return this.expenseJpaMapper.sumNetBalance();
+        return this.expenseJpaMapper.sumNetBalance(this.currentUserService.getRequiredUserId());
     }
 }

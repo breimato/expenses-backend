@@ -19,6 +19,7 @@ public interface PostExpenseRequestMapper {
      * @return the expense entity
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "movementType", ignore = true)

@@ -30,3 +30,6 @@ server:
 expenses:
   recurring:
     apply-on-startup: false
+  auth:
+    jwt-secret: ${JWT_SECRET:expenses-local-dev-secret-change-in-prod-32b}
+    jwt-expiration-minutes: ${JWT_EXPIRATION_MINUTES:10080}

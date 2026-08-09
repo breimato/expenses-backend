@@ -30,6 +30,10 @@ public class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /** The user id. */
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
+
     /** The name. */
     @Column(nullable = false, length = 100)
     private String name;

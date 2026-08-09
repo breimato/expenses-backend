@@ -1,0 +1,9 @@
+type: object
+required:
+  - accessToken
+  - user
+properties:
+  accessToken:
+    type: string
+  user:
+    $ref: '../components/AuthUserV1.yaml'

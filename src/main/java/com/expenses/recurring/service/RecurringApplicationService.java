@@ -3,12 +3,14 @@ package com.expenses.recurring.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.expenses.api.dto.PostExpenseV1RequestDto;
+import com.expenses.auth.service.CurrentUserService;
 import com.expenses.common.RecurringFrequency;
 import com.expenses.expense.entity.ExpenseEntity;
 import com.expenses.expense.repository.ExpenseRepository;
@@ -39,8 +41,11 @@ public class RecurringApplicationService {
     /** The recurring template repository. */
     private final RecurringTemplateRepository recurringTemplateRepository;
 
+    /** The current user service. */
+    private final CurrentUserService currentUserService;
+
     /**
-     * Apply all due recurring templates for the given reference date.
+     * Apply all due recurring templates for all users (scheduler).
      *
      * @param referenceDate the reference date
      * @return the number of templates applied
@@ -48,24 +53,28 @@ public class RecurringApplicationService {
     @Transactional
     public int applyPending(final LocalDate referenceDate) {
 
-        final var dueTemplates = this.recurringTemplateJpaMapper.findDueAutoApplyTemplates(
-                RecurringFrequency.MONTHLY,
-                referenceDate.getDayOfMonth());
-        final var periodKey = referenceDate.format(PERIOD_KEY_FORMAT);
-        var appliedCount = 0;
+        return this.applyTemplates(
+                this.recurringTemplateJpaMapper.findDueAutoApplyTemplates(
+                        RecurringFrequency.MONTHLY,
+                        referenceDate.getDayOfMonth()),
+                referenceDate);
+    }
 
-        for (final var template : dueTemplates) {
-            if (this.recurringApplicationJpaMapper.findByTemplateIdAndPeriodKey(template.getId(), periodKey).isPresent()) {
-                continue;
-            }
-            final var expenseDate = this.resolveExpenseDate(template, referenceDate);
-            final var movement = this.createMovementFromTemplate(template, expenseDate);
-            this.recordApplication(template.getId(), periodKey, movement.getId());
-            this.recurringTemplateRepository.markAsUsed(template);
-            appliedCount++;
-        }
+    /**
+     * Apply due recurring templates for the current authenticated user.
+     *
+     * @param referenceDate the reference date
+     * @return the number of templates applied
+     */
+    @Transactional
+    public int applyPendingForCurrentUser(final LocalDate referenceDate) {
 
-        return appliedCount;
+        return this.applyTemplates(
+                this.recurringTemplateJpaMapper.findDueAutoApplyTemplatesForUser(
+                        this.currentUserService.getRequiredUserId(),
+                        RecurringFrequency.MONTHLY,
+                        referenceDate.getDayOfMonth()),
+                referenceDate);
     }
 
     /**
@@ -88,7 +97,24 @@ public class RecurringApplicationService {
                 .movementType(com.expenses.api.dto.MovementTypeV1.valueOf(recurringTemplateEntity.getMovementType().name()))
                 .offsetsSpendingAverage(recurringTemplateEntity.isOffsetsSpendingAverage())
                 .build();
-        return this.expenseRepository.create(postExpenseV1RequestDto);
+        return this.expenseRepository.create(postExpenseV1RequestDto, recurringTemplateEntity.getUserId());
+    }
+
+    private int applyTemplates(final List<RecurringTemplateEntity> dueTemplates, final LocalDate referenceDate) {
+
+        final var periodKey = referenceDate.format(PERIOD_KEY_FORMAT);
+        var appliedCount = 0;
+        for (final var template : dueTemplates) {
+            if (this.recurringApplicationJpaMapper.findByTemplateIdAndPeriodKey(template.getId(), periodKey).isPresent()) {
+                continue;
+            }
+            final var expenseDate = this.resolveExpenseDate(template, referenceDate);
+            final var movement = this.createMovementFromTemplate(template, expenseDate);
+            this.recordApplication(template.getId(), periodKey, movement.getId());
+            this.recurringTemplateRepository.markAsUsed(template);
+            appliedCount++;
+        }
+        return appliedCount;
     }
 
     private LocalDate resolveExpenseDate(final RecurringTemplateEntity template, final LocalDate referenceDate) {

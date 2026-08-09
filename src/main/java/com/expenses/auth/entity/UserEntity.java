@@ -1,6 +1,5 @@
-package com.expenses.profile.entity;
+package com.expenses.auth.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -15,29 +14,29 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** The Class Profile Entity. */
+/** The Class User Entity. */
 @Entity
-@Table(name = "profile")
+@Table(name = "users")
 @Getter
 @Setter
-public class ProfileEntity {
+public class UserEntity {
 
     /** The id. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    /** The user id. */
-    @Column(name = "user_id", nullable = false, unique = true)
-    private Integer userId;
+    /** The email. */
+    @Column(nullable = false, unique = true, length = 255)
+    private String email;
+
+    /** The password hash. */
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
 
     /** The display name. */
     @Column(name = "display_name", nullable = false, length = 100)
     private String displayName;
-
-    /** The balance. */
-    @Column(nullable = false, precision = 19, scale = 2)
-    private BigDecimal balance;
 
     /** The created at. */
     @Column(name = "created_at", nullable = false)

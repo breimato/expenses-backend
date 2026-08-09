@@ -1,0 +1,15 @@
+type: object
+required:
+  - id
+  - email
+  - displayName
+properties:
+  id:
+    type: integer
+    format: int32
+  email:
+    type: string
+    format: email
+  displayName:
+    type: string
+    maxLength: 100

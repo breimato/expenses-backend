@@ -1,0 +1,32 @@
+post:
+  summary: "Post Auth Register V1"
+  description: "Register a new user with email and password"
+  operationId: "PostAuthRegisterV1"
+  tags:
+    - post-auth-register-v1
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/PostAuthRegisterV1Request.yaml'
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/AuthV1Response.yaml'
+    '409':
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

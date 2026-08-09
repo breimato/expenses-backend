@@ -4,7 +4,15 @@ info:
   version: 1.0.0
   description: Expenses service API
 
+security:
+  - bearerAuth: []
+
 paths:
+  # Auth
+  /v1/auth/register:
+    $ref: './auth/register-v1.api.yaml'
+  /v1/auth/login:
+    $ref: './auth/login-v1.api.yaml'
   # Categories
   /v1/expenses/categories:
     $ref: './expenses/categories-v1.api.yaml'
@@ -34,9 +42,22 @@ paths:
     $ref: './expenses/analytics-projections-v1.api.yaml'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     ApiError:
       $ref: './components/ApiErrorV1.yaml'
+    AuthUserV1:
+      $ref: './components/AuthUserV1.yaml'
+    PostAuthRegisterV1Request:
+      $ref: './requests/PostAuthRegisterV1Request.yaml'
+    PostAuthLoginV1Request:
+      $ref: './requests/PostAuthLoginV1Request.yaml'
+    AuthV1Response:
+      $ref: './responses/AuthV1Response.yaml'
     CategoryV1:
       $ref: './components/CategoryV1.yaml'
     ExpenseV1:

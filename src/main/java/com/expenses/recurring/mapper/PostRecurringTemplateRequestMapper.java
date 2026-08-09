@@ -19,6 +19,7 @@ public interface PostRecurringTemplateRequestMapper {
      * @return the recurring template entity
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "lastUsedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

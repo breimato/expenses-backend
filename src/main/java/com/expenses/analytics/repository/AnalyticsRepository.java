@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.auth.service.CurrentUserService;
 import com.expenses.expense.repository.ExpenseJpaMapper;
 import com.expenses.profile.repository.ProfileRepository;
 
@@ -22,6 +23,9 @@ public class AnalyticsRepository {
     /** The profile repository. */
     private final ProfileRepository profileRepository;
 
+    /** The current user service. */
+    private final CurrentUserService currentUserService;
+
     /**
      * Sum net spending in the given date range.
      *
@@ -32,7 +36,10 @@ public class AnalyticsRepository {
     @Transactional(readOnly = true)
     public BigDecimal sumNetSpendingByDateRange(final LocalDate dateFrom, final LocalDate dateTo) {
 
-        return this.expenseJpaMapper.sumNetSpendingByDateRange(dateFrom, dateTo);
+        return this.expenseJpaMapper.sumNetSpendingByDateRange(
+                this.currentUserService.getRequiredUserId(),
+                dateFrom,
+                dateTo);
     }
 
     /**

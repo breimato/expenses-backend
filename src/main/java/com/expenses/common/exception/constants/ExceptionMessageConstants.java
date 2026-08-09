@@ -22,6 +22,15 @@ public final class ExceptionMessageConstants {
     /** The Constant PROFILE_NOT_FOUND. */
     public static final String PROFILE_NOT_FOUND = "EXP-PROFILE-001 | No se encontró el perfil";
 
+    /** The Constant AUTH_EMAIL_ALREADY_EXISTS. */
+    public static final String AUTH_EMAIL_ALREADY_EXISTS = "EXP-AUTH-001 | Ya existe un usuario con ese email";
+
+    /** The Constant AUTH_INVALID_CREDENTIALS. */
+    public static final String AUTH_INVALID_CREDENTIALS = "EXP-AUTH-002 | Email o contraseña incorrectos";
+
+    /** The Constant AUTH_UNAUTHORIZED. */
+    public static final String AUTH_UNAUTHORIZED = "EXP-AUTH-003 | No autenticado";
+
     /** The Constant INTERNAL_ERROR. */
     public static final String INTERNAL_ERROR = "EXP-GENERAL-001 | Ha ocurrido un error inesperado";
 

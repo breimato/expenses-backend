@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.expenses.api.dto.MovementTypeV1;
 import com.expenses.api.dto.PatchCategoryV1RequestDto;
 import com.expenses.api.dto.PostCategoryV1RequestDto;
+import com.expenses.auth.service.CurrentUserService;
 import com.expenses.category.entity.CategoryEntity;
 import com.expenses.category.mapper.PatchCategoryRequestMapper;
 import com.expenses.category.mapper.PostCategoryRequestMapper;
@@ -44,6 +45,9 @@ public class CategoryRepository {
     /** The recurring template jpa mapper. */
     private final RecurringTemplateJpaMapper recurringTemplateJpaMapper;
 
+    /** The current user service. */
+    private final CurrentUserService currentUserService;
+
     /**
      * Find all.
      *
@@ -56,7 +60,10 @@ public class CategoryRepository {
     public List<CategoryEntity> findAll(final Integer id, final String name, final MovementTypeV1 movementType) {
 
         return this.categoryJpaMapper.findAll(CategorySpecification.withFilters(
-                id, name, this.enumMapper.toMovementTypeOrNull(movementType)));
+                this.currentUserService.getRequiredUserId(),
+                id,
+                name,
+                this.enumMapper.toMovementTypeOrNull(movementType)));
     }
 
     /**
@@ -69,6 +76,7 @@ public class CategoryRepository {
     public CategoryEntity create(final PostCategoryV1RequestDto postCategoryV1RequestDto) {
 
         final var categoryEntity = this.postCategoryRequestMapper.toCategoryEntity(postCategoryV1RequestDto);
+        categoryEntity.setUserId(this.currentUserService.getRequiredUserId());
         if (Objects.nonNull(postCategoryV1RequestDto.getMovementType())) {
             categoryEntity.setMovementType(this.enumMapper.toMovementType(postCategoryV1RequestDto.getMovementType()));
         }
@@ -109,7 +117,7 @@ public class CategoryRepository {
     }
 
     /**
-     * Find by id.
+     * Find by id for current user.
      *
      * @param id the id
      * @return the category entity
@@ -117,12 +125,25 @@ public class CategoryRepository {
     @Transactional(readOnly = true)
     public CategoryEntity findById(final Integer id) {
 
-        return this.categoryJpaMapper.findById(id)
+        return this.findByIdForUser(id, this.currentUserService.getRequiredUserId());
+    }
+
+    /**
+     * Find by id for user.
+     *
+     * @param id the id
+     * @param userId the user id
+     * @return the category entity
+     */
+    @Transactional(readOnly = true)
+    public CategoryEntity findByIdForUser(final Integer id, final Integer userId) {
+
+        return this.categoryJpaMapper.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new CategoryException(ExceptionMessageConstants.CATEGORY_NOT_FOUND));
     }
 
     /**
-     * Exists by id.
+     * Exists by id for current user.
      *
      * @param id the id
      * @return true, if successful
@@ -130,6 +151,19 @@ public class CategoryRepository {
     @Transactional(readOnly = true)
     public boolean existsById(final Integer id) {
 
-        return this.categoryJpaMapper.existsById(id);
+        return this.existsByIdForUser(id, this.currentUserService.getRequiredUserId());
+    }
+
+    /**
+     * Exists by id for user.
+     *
+     * @param id the id
+     * @param userId the user id
+     * @return true, if successful
+     */
+    @Transactional(readOnly = true)
+    public boolean existsByIdForUser(final Integer id, final Integer userId) {
+
+        return this.categoryJpaMapper.findByIdAndUserId(id, userId).isPresent();
     }
 }

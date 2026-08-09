@@ -19,19 +19,21 @@ public final class CategorySpecification {
     /**
      * Build specification for optional category filters.
      *
+     * @param userId the user id
      * @param id the id
      * @param name the name
      * @param movementType the movement type
      * @return the specification
      */
     public static Specification<CategoryEntity> withFilters(
+            final Integer userId,
             final Integer id,
             final String name,
             final MovementType movementType) {
 
         return (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
-
+            predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
             if (id != null) {
                 predicates.add(criteriaBuilder.equal(root.get("id"), id));
             }
@@ -43,14 +45,9 @@ public final class CategorySpecification {
             if (movementType != null) {
                 predicates.add(criteriaBuilder.equal(root.get("movementType"), movementType));
             }
-
             query.orderBy(
                     criteriaBuilder.asc(root.get("name")),
                     criteriaBuilder.asc(root.get("id")));
-
-            if (predicates.isEmpty()) {
-                return criteriaBuilder.conjunction();
-            }
             return criteriaBuilder.and(predicates.toArray(Predicate[]::new));
         };
     }
