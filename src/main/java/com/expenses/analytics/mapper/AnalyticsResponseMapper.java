@@ -4,10 +4,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.expenses.analytics.model.AnalyticsAveragesResult;
+import com.expenses.analytics.model.AnalyticsCategoryBreakdownResult;
+import com.expenses.analytics.model.AnalyticsCategorySpendItemResult;
 import com.expenses.analytics.model.AnalyticsProjectionsResult;
 import com.expenses.api.dto.AnalyticsAveragesV1Dto;
+import com.expenses.api.dto.AnalyticsCategorySpendItemV1Dto;
 import com.expenses.api.dto.AnalyticsProjectionsV1Dto;
 import com.expenses.api.dto.GetAnalyticsAveragesV1ResponseDto;
+import com.expenses.api.dto.GetAnalyticsCategoryBreakdownV1ResponseAnalyticsCategoryBreakdown;
+import com.expenses.api.dto.GetAnalyticsCategoryBreakdownV1ResponseDto;
 import com.expenses.api.dto.GetAnalyticsProjectionsV1ResponseDto;
 import com.expenses.common.DecimalMapper;
 
@@ -60,6 +65,37 @@ public interface AnalyticsResponseMapper {
 
         return GetAnalyticsProjectionsV1ResponseDto.builder()
                 .analyticsProjections(this.toAnalyticsProjectionsV1Dto(analyticsProjectionsResult))
+                .build();
+    }
+
+    /**
+     * To analytics category spend item v1 dto.
+     *
+     * @param analyticsCategorySpendItemResult the item result
+     * @return the dto
+     */
+    AnalyticsCategorySpendItemV1Dto toAnalyticsCategorySpendItemV1Dto(
+            AnalyticsCategorySpendItemResult analyticsCategorySpendItemResult);
+
+    /**
+     * To get analytics category breakdown v1 response.
+     *
+     * @param analyticsCategoryBreakdownResult the breakdown result
+     * @return the response dto
+     */
+    default GetAnalyticsCategoryBreakdownV1ResponseDto toGetAnalyticsCategoryBreakdownV1Response(
+            final AnalyticsCategoryBreakdownResult analyticsCategoryBreakdownResult) {
+
+        final var analyticsCategorySpendItemV1Dtos = analyticsCategoryBreakdownResult.items().stream()
+                .map(this::toAnalyticsCategorySpendItemV1Dto)
+                .toList();
+        final var getAnalyticsCategoryBreakdownV1ResponseAnalyticsCategoryBreakdown =
+                GetAnalyticsCategoryBreakdownV1ResponseAnalyticsCategoryBreakdown.builder()
+                        .totalSpent(analyticsCategoryBreakdownResult.totalSpent().toPlainString())
+                        .items(analyticsCategorySpendItemV1Dtos)
+                        .build();
+        return GetAnalyticsCategoryBreakdownV1ResponseDto.builder()
+                .analyticsCategoryBreakdown(getAnalyticsCategoryBreakdownV1ResponseAnalyticsCategoryBreakdown)
                 .build();
     }
 }

@@ -1,0 +1,22 @@
+description: "Analytics category spend item V1"
+type: object
+required:
+  - categoryId
+  - categoryName
+  - categoryColor
+  - total
+  - percent
+properties:
+  categoryId:
+    type: integer
+    format: int32
+  categoryName:
+    type: string
+  categoryColor:
+    type: string
+  total:
+    type: string
+    description: "Total spent in this category for the period"
+  percent:
+    type: string
+    description: "Percentage of month total spent (0-100)"

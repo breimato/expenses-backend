@@ -1,0 +1,16 @@
+description: "Get Analytics Category Breakdown V1 Response"
+type: object
+properties:
+  analyticsCategoryBreakdown:
+    type: object
+    required:
+      - totalSpent
+      - items
+    properties:
+      totalSpent:
+        type: string
+        description: "Total EXPENSE spending for the period"
+      items:
+        type: array
+        items:
+          $ref: '../components/AnalyticsCategorySpendItemV1.yaml'

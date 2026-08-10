@@ -40,6 +40,8 @@ paths:
     $ref: './expenses/analytics-averages-v1.api.yaml'
   /v1/expenses/analytics/projections:
     $ref: './expenses/analytics-projections-v1.api.yaml'
+  /v1/expenses/analytics/category-breakdown:
+    $ref: './expenses/analytics-category-breakdown-v1.api.yaml'
 
 components:
   securitySchemes:
@@ -70,6 +72,8 @@ components:
       $ref: './components/AnalyticsAveragesV1.yaml'
     AnalyticsProjectionsV1:
       $ref: './components/AnalyticsProjectionsV1.yaml'
+    AnalyticsCategorySpendItemV1:
+      $ref: './components/AnalyticsCategorySpendItemV1.yaml'
     PostCategoryV1Request:
       $ref: './requests/PostCategoryV1Request.yaml'
     PatchCategoryV1Request:
@@ -108,6 +112,8 @@ components:
       $ref: './responses/GetAnalyticsAveragesV1Response.yaml'
     GetAnalyticsProjectionsV1Response:
       $ref: './responses/GetAnalyticsProjectionsV1Response.yaml'
+    GetAnalyticsCategoryBreakdownV1Response:
+      $ref: './responses/GetAnalyticsCategoryBreakdownV1Response.yaml'
     PostRecurringTemplatesApplyPendingV1Response:
       $ref: './responses/PostRecurringTemplatesApplyPendingV1Response.yaml'
     MovementTypeV1:

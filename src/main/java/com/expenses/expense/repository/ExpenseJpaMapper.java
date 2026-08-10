@@ -2,6 +2,7 @@ package com.expenses.expense.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -69,6 +70,44 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
             WHERE expenseEntity.userId = :userId
             """)
     BigDecimal sumNetBalance(@Param("userId") Integer userId);
+
+    /**
+     * Find the earliest movement date for user.
+     *
+     * @param userId the user id
+     * @return the optional earliest expense date
+     */
+    @Query("""
+            SELECT MIN(expenseEntity.expenseDate)
+            FROM ExpenseEntity expenseEntity
+            WHERE expenseEntity.userId = :userId
+            """)
+    Optional<LocalDate> findMinExpenseDateByUserId(@Param("userId") Integer userId);
+
+    /**
+     * Sum expense amounts by category for user in date range.
+     *
+     * @param userId the user id
+     * @param dateFrom the date from
+     * @param dateTo the date to
+     * @return the aggregates
+     */
+    @Query("""
+            SELECT expenseEntity.categoryId AS categoryId,
+                   COALESCE(SUM(expenseEntity.amount), 0) AS total
+            FROM ExpenseEntity expenseEntity
+            WHERE expenseEntity.userId = :userId
+              AND expenseEntity.expenseDate >= :dateFrom
+              AND expenseEntity.expenseDate <= :dateTo
+              AND expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE
+              AND expenseEntity.offsetsSpendingAverage = false
+            GROUP BY expenseEntity.categoryId
+            ORDER BY total DESC
+            """)
+    List<CategorySpendAggregate> sumExpenseByCategory(
+            @Param("userId") Integer userId,
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo);
 
     /**
      * Check if any expense exists for category.

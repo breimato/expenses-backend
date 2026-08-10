@@ -2,11 +2,16 @@ package com.expenses.analytics.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.expenses.auth.service.CurrentUserService;
+import com.expenses.category.entity.CategoryEntity;
+import com.expenses.category.repository.CategoryJpaMapper;
+import com.expenses.expense.repository.CategorySpendAggregate;
 import com.expenses.expense.repository.ExpenseJpaMapper;
 import com.expenses.profile.repository.ProfileRepository;
 
@@ -19,6 +24,9 @@ public class AnalyticsRepository {
 
     /** The expense jpa mapper. */
     private final ExpenseJpaMapper expenseJpaMapper;
+
+    /** The category jpa mapper. */
+    private final CategoryJpaMapper categoryJpaMapper;
 
     /** The profile repository. */
     private final ProfileRepository profileRepository;
@@ -40,6 +48,44 @@ public class AnalyticsRepository {
                 this.currentUserService.getRequiredUserId(),
                 dateFrom,
                 dateTo);
+    }
+
+    /**
+     * Find earliest movement date for the current user.
+     *
+     * @return the optional first movement date
+     */
+    @Transactional(readOnly = true)
+    public Optional<LocalDate> findFirstMovementDate() {
+
+        return this.expenseJpaMapper.findMinExpenseDateByUserId(this.currentUserService.getRequiredUserId());
+    }
+
+    /**
+     * Sum expenses by category for current user in date range.
+     *
+     * @param dateFrom the date from
+     * @param dateTo the date to
+     * @return the aggregates
+     */
+    @Transactional(readOnly = true)
+    public List<CategorySpendAggregate> sumExpenseByCategory(final LocalDate dateFrom, final LocalDate dateTo) {
+
+        return this.expenseJpaMapper.sumExpenseByCategory(
+                this.currentUserService.getRequiredUserId(),
+                dateFrom,
+                dateTo);
+    }
+
+    /**
+     * Find categories for current user.
+     *
+     * @return the category entities
+     */
+    @Transactional(readOnly = true)
+    public List<CategoryEntity> findCategoriesForCurrentUser() {
+
+        return this.categoryJpaMapper.findByUserId(this.currentUserService.getRequiredUserId());
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.expenses.category.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,12 @@ public interface CategoryJpaMapper extends JpaRepository<CategoryEntity, Integer
      * @return the optional category
      */
     Optional<CategoryEntity> findByIdAndUserId(Integer id, Integer userId);
+
+    /**
+     * Find all by user id.
+     *
+     * @param userId the user id
+     * @return the list
+     */
+    List<CategoryEntity> findByUserId(Integer userId);
 }
