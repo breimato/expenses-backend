@@ -100,7 +100,6 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
               AND expenseEntity.expenseDate >= :dateFrom
               AND expenseEntity.expenseDate <= :dateTo
               AND expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE
-              AND expenseEntity.offsetsSpendingAverage = false
             GROUP BY expenseEntity.categoryId
             ORDER BY total DESC
             """)
