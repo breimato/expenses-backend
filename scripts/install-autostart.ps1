@@ -1,20 +1,44 @@
-# Installs autostart without admin rights via the user Startup folder.
+# Registers start-expenses-stack.ps1 to run at Windows logon (Scheduled Task, no admin).
 
 $ErrorActionPreference = 'Stop'
 
 $scriptPath = Join-Path $PSScriptRoot 'start-expenses-stack.ps1'
-$startupDir = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Startup'
-$cmdPath = Join-Path $startupDir 'ExpensesHomeStack.cmd'
+$taskName = 'ExpensesHomeStack'
+$startupCmd = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Startup\ExpensesHomeStack.cmd'
 
-New-Item -ItemType Directory -Force -Path $startupDir | Out-Null
+if (-not (Test-Path $scriptPath)) {
+    throw "No se encontró el script: $scriptPath"
+}
 
-@(
-    '@echo off'
-    "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
-) | Set-Content -Path $cmdPath -Encoding ASCII
+$action = New-ScheduledTaskAction `
+    -Execute 'powershell.exe' `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
 
-Write-Host "Autostart instalado (carpeta Inicio del usuario):"
-Write-Host "  $cmdPath"
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+
+$settings = New-ScheduledTaskSettingsSet `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -StartWhenAvailable `
+    -MultipleInstances IgnoreNew
+
+Register-ScheduledTask `
+    -TaskName $taskName `
+    -Action $action `
+    -Trigger $trigger `
+    -Settings $settings `
+    -Description 'Arranca PostgreSQL, backend, túnel Cloudflare y publica runtime-config al iniciar sesión.' `
+    -Force | Out-Null
+
+# Evitar doble ejecución si quedó un acceso directo antiguo en Inicio.
+Remove-Item -Path $startupCmd -ErrorAction SilentlyContinue
+
+Write-Host "Autostart instalado (tarea programada al iniciar sesión):"
+Write-Host "  Nombre: $taskName"
+Write-Host "  Script: $scriptPath"
 Write-Host ""
-Write-Host "Se ejecutará al iniciar sesión. Para probar ahora:"
-Write-Host "  powershell -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+Write-Host "Para probar ahora:"
+Write-Host "  Start-ScheduledTask -TaskName '$taskName'"
+Write-Host ""
+Write-Host "Para desinstalar:"
+Write-Host "  Unregister-ScheduledTask -TaskName '$taskName' -Confirm:`$false"

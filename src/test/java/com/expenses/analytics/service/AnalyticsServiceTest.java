@@ -39,9 +39,9 @@ class AnalyticsServiceTest {
         final var referenceDate = LocalDate.of(2026, 8, 14);
         final var monthStart = LocalDate.of(2026, 8, 1);
         final var firstMovementDate = LocalDate.of(2026, 8, 14);
-        final var mtdTotal = new BigDecimal("10.00");
+        final var netSpending = new BigDecimal("10.00");
         when(this.analyticsRepository.findFirstMovementDate()).thenReturn(Optional.of(firstMovementDate));
-        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(mtdTotal);
+        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
 
         // When
         final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
@@ -60,9 +60,9 @@ class AnalyticsServiceTest {
         final var referenceDate = LocalDate.of(2026, 8, 14);
         final var monthStart = LocalDate.of(2026, 8, 1);
         final var firstMovementDate = LocalDate.of(2026, 7, 20);
-        final var mtdTotal = new BigDecimal("140.00");
+        final var netSpending = new BigDecimal("140.00");
         when(this.analyticsRepository.findFirstMovementDate()).thenReturn(Optional.of(firstMovementDate));
-        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(mtdTotal);
+        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
 
         // When
         final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
