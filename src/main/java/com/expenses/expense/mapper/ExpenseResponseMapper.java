@@ -12,10 +12,11 @@ import com.expenses.api.dto.GetExpensesV1ResponseDto;
 import com.expenses.common.DateMapper;
 import com.expenses.common.DecimalMapper;
 import com.expenses.common.EnumMapper;
+import com.expenses.common.JsonNullableMapper;
 import com.expenses.expense.entity.ExpenseEntity;
 
 /** The Interface Expense Response Mapper. */
-@Mapper(componentModel = "spring", uses = { DateMapper.class, DecimalMapper.class, EnumMapper.class })
+@Mapper(componentModel = "spring", uses = { DateMapper.class, DecimalMapper.class, EnumMapper.class, JsonNullableMapper.class })
 public interface ExpenseResponseMapper {
 
     /**
@@ -24,6 +25,7 @@ public interface ExpenseResponseMapper {
      * @param expenseEntity the expense entity
      * @return the expense v1 dto
      */
+    @Mapping(target = "reimbursedExpenseId", source = "reimbursedExpenseId", qualifiedByName = "mapInteger")
     ExpenseV1Dto toExpenseV1Dto(ExpenseEntity expenseEntity);
 
     /**

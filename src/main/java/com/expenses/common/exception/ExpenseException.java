@@ -14,4 +14,15 @@ public class ExpenseException extends ExpensesException {
 
         super(message, HttpStatus.NOT_FOUND);
     }
+
+    /**
+     * Instantiates a new expense exception with custom status.
+     *
+     * @param message the message
+     * @param httpStatus the http status
+     */
+    public ExpenseException(final String message, final HttpStatus httpStatus) {
+
+        super(message, httpStatus);
+    }
 }

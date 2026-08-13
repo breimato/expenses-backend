@@ -2,6 +2,7 @@ package com.expenses.expense.mapper;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
@@ -21,5 +22,6 @@ public interface PatchExpenseRequestMapper {
      * @param expenseEntity the expense entity
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "reimbursedExpenseId", ignore = true)
     void updateExpenseEntity(PatchExpenseV1RequestDto patchExpenseV1RequestDto, @MappingTarget ExpenseEntity expenseEntity);
 }

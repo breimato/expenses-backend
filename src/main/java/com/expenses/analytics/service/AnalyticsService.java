@@ -219,7 +219,8 @@ public class AnalyticsService {
      */
     private BigDecimal normalizeTotal(final CategorySpendAggregate categorySpendAggregate) {
 
-        return Objects.requireNonNullElse(categorySpendAggregate.getTotal(), BigDecimal.ZERO);
+        return Objects.requireNonNullElse(categorySpendAggregate.getTotal(), BigDecimal.ZERO)
+                .max(BigDecimal.ZERO);
     }
 
     /**

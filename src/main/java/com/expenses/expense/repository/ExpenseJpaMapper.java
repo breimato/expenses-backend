@@ -94,7 +94,12 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
      */
     @Query("""
             SELECT expenseEntity.categoryId AS categoryId,
-                   COALESCE(SUM(expenseEntity.amount), 0) AS total
+                   COALESCE(SUM(expenseEntity.amount), 0)
+                       - COALESCE(SUM((
+                           SELECT COALESCE(SUM(reimbursement.amount), 0)
+                           FROM ExpenseEntity reimbursement
+                           WHERE reimbursement.reimbursedExpenseId = expenseEntity.id
+                       )), 0) AS total
             FROM ExpenseEntity expenseEntity
             WHERE expenseEntity.userId = :userId
               AND expenseEntity.expenseDate >= :dateFrom

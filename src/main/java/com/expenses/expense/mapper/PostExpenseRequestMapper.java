@@ -24,6 +24,7 @@ public interface PostExpenseRequestMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "movementType", ignore = true)
     @Mapping(target = "offsetsSpendingAverage", ignore = true)
+    @Mapping(target = "reimbursedExpenseId", ignore = true)
     @Mapping(target = "amount", source = "amount")
     ExpenseEntity toExpenseEntity(PostExpenseV1RequestDto postExpenseV1RequestDto);
 }

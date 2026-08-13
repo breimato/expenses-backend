@@ -23,3 +23,10 @@ properties:
     description: >-
       Incomes: reduces net spending in analytics averages (e.g. reimbursements).
       Expenses: excludes the amount from analytics averages (e.g. savings/investments).
+  reimbursedExpenseId:
+    type: integer
+    format: int32
+    nullable: true
+    description: >-
+      Income only: optional link to the expense this reimbursement offsets.
+      When set, offsetsSpendingAverage is forced to true. Clear with null.

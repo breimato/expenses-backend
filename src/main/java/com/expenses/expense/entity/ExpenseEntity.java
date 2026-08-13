@@ -64,6 +64,12 @@ public class ExpenseEntity {
     @Column(name = "offsets_spending_average", nullable = false)
     private boolean offsetsSpendingAverage;
 
+    /**
+     * Income only: expense this reimbursement offsets (category breakdown nets against that expense).
+     */
+    @Column(name = "reimbursed_expense_id")
+    private Integer reimbursedExpenseId;
+
     /** The created at. */
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

@@ -16,6 +16,14 @@ public final class ExceptionMessageConstants {
     /** The Constant EXPENSE_NOT_FOUND. */
     public static final String EXPENSE_NOT_FOUND = "EXP-EXPENSE-001 | No se encontró el gasto";
 
+    /** The Constant EXPENSE_REIMBURSED_NOT_FOUND. */
+    public static final String EXPENSE_REIMBURSED_NOT_FOUND =
+            "EXP-EXPENSE-002 | No se encontró el gasto a reembolsar";
+
+    /** The Constant EXPENSE_REIMBURSED_MUST_BE_EXPENSE. */
+    public static final String EXPENSE_REIMBURSED_MUST_BE_EXPENSE =
+            "EXP-EXPENSE-003 | Solo se puede vincular un reembolso a un movimiento de tipo gasto";
+
     /** The Constant RECURRING_TEMPLATE_NOT_FOUND. */
     public static final String RECURRING_TEMPLATE_NOT_FOUND = "EXP-RECURRING-001 | No se encontró la plantilla recurrente";
 

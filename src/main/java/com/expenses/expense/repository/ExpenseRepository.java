@@ -3,6 +3,7 @@ package com.expenses.expense.repository;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,8 @@ import com.expenses.expense.entity.ExpenseEntity;
 import com.expenses.expense.mapper.PatchExpenseRequestMapper;
 import com.expenses.expense.mapper.PostExpenseRequestMapper;
 import com.expenses.recurring.repository.RecurringApplicationJpaMapper;
+
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import lombok.RequiredArgsConstructor;
 
@@ -107,6 +110,11 @@ public class ExpenseRepository {
         } else {
             expenseEntity.setOffsetsSpendingAverage(postExpenseV1RequestDto.getOffsetsSpendingAverage());
         }
+        this.applyReimbursedExpenseLink(
+                expenseEntity,
+                movementType,
+                userId,
+                this.unwrapInteger(postExpenseV1RequestDto.getReimbursedExpenseId()));
         return this.expenseJpaMapper.save(expenseEntity);
     }
 
@@ -139,6 +147,16 @@ public class ExpenseRepository {
         if (Objects.nonNull(patchExpenseV1RequestDto.getMovementType())) {
             expenseEntity.setMovementType(this.enumMapper.toMovementType(patchExpenseV1RequestDto.getMovementType()));
         }
+        if (Objects.nonNull(patchExpenseV1RequestDto.getReimbursedExpenseId())
+                && patchExpenseV1RequestDto.getReimbursedExpenseId().isPresent()) {
+            this.applyReimbursedExpenseLink(
+                    expenseEntity,
+                    expenseEntity.getMovementType(),
+                    expenseEntity.getUserId(),
+                    patchExpenseV1RequestDto.getReimbursedExpenseId().get());
+        } else if (expenseEntity.getMovementType() != MovementType.INCOME) {
+            expenseEntity.setReimbursedExpenseId(null);
+        }
         return this.expenseJpaMapper.save(expenseEntity);
     }
 
@@ -166,6 +184,35 @@ public class ExpenseRepository {
 
         return this.expenseJpaMapper.findByIdAndUserId(id, this.currentUserService.getRequiredUserId())
                 .orElseThrow(() -> new ExpenseException(ExceptionMessageConstants.EXPENSE_NOT_FOUND));
+    }
+
+    private void applyReimbursedExpenseLink(
+            final ExpenseEntity expenseEntity,
+            final MovementType movementType,
+            final Integer userId,
+            final Integer reimbursedExpenseId) {
+
+        if (movementType != MovementType.INCOME || Objects.isNull(reimbursedExpenseId)) {
+            expenseEntity.setReimbursedExpenseId(null);
+            return;
+        }
+        final var reimbursedExpenseEntity = this.expenseJpaMapper.findByIdAndUserId(reimbursedExpenseId, userId)
+                .orElseThrow(() -> new ExpenseException(ExceptionMessageConstants.EXPENSE_REIMBURSED_NOT_FOUND));
+        if (reimbursedExpenseEntity.getMovementType() != MovementType.EXPENSE) {
+            throw new ExpenseException(
+                    ExceptionMessageConstants.EXPENSE_REIMBURSED_MUST_BE_EXPENSE,
+                    HttpStatus.BAD_REQUEST);
+        }
+        expenseEntity.setReimbursedExpenseId(reimbursedExpenseId);
+        expenseEntity.setOffsetsSpendingAverage(true);
+    }
+
+    private Integer unwrapInteger(final JsonNullable<Integer> jsonNullable) {
+
+        if (Objects.isNull(jsonNullable) || !jsonNullable.isPresent()) {
+            return null;
+        }
+        return jsonNullable.get();
     }
 
     private void ensureCategoryMatchesMovement(
