@@ -3,4 +3,7 @@ type: object
 properties:
   dailyAverage:
     type: string
-    description: "Daily average net spending for the current month (from day 1)"
+    description: "Daily average net spending for the month ending on the reference date"
+  balanceAsOf:
+    type: string
+    description: "Net account balance from all movements on or before the reference date"

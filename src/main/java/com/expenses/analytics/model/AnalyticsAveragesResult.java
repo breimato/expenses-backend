@@ -6,5 +6,5 @@ import lombok.Builder;
 
 /** Analytics averages calculation result. */
 @Builder
-public record AnalyticsAveragesResult(BigDecimal dailyAverage) {
+public record AnalyticsAveragesResult(BigDecimal dailyAverage, BigDecimal balanceAsOf) {
 }

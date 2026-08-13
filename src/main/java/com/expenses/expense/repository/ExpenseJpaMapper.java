@@ -72,6 +72,29 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
     BigDecimal sumNetBalance(@Param("userId") Integer userId);
 
     /**
+     * Sum net balance from movements on or before the given date.
+     *
+     * @param userId the user id
+     * @param dateTo the inclusive end date
+     * @return the balance as of date
+     */
+    @Query("""
+            SELECT COALESCE(SUM(
+                CASE
+                    WHEN expenseEntity.movementType = com.expenses.common.MovementType.INCOME THEN expenseEntity.amount
+                    WHEN expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE THEN -expenseEntity.amount
+                    ELSE 0
+                END
+            ), 0)
+            FROM ExpenseEntity expenseEntity
+            WHERE expenseEntity.userId = :userId
+              AND expenseEntity.expenseDate <= :dateTo
+            """)
+    BigDecimal sumNetBalanceAsOf(
+            @Param("userId") Integer userId,
+            @Param("dateTo") LocalDate dateTo);
+
+    /**
      * Find the earliest movement date for user.
      *
      * @param userId the user id

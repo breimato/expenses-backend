@@ -101,6 +101,18 @@ public class AnalyticsRepository {
     }
 
     /**
+     * Sum net balance as of a date for the current user.
+     *
+     * @param dateTo the inclusive end date
+     * @return the balance
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal sumNetBalanceAsOf(final LocalDate dateTo) {
+
+        return this.expenseJpaMapper.sumNetBalanceAsOf(this.currentUserService.getRequiredUserId(), dateTo);
+    }
+
+    /**
      * Sum expenses by category for current user in date range.
      *
      * @param dateFrom the date from

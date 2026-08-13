@@ -55,8 +55,12 @@ public class AnalyticsService {
     public AnalyticsAveragesResult computeAverages(final LocalDate referenceDate) {
 
         final var monthSpendingPace = this.resolveMonthSpendingPace(referenceDate);
+        final var balanceAsOf = Objects.requireNonNullElse(
+                this.analyticsRepository.sumNetBalanceAsOf(referenceDate),
+                BigDecimal.ZERO);
         return AnalyticsAveragesResult.builder()
                 .dailyAverage(this.divide(monthSpendingPace.netSpending(), monthSpendingPace.daysElapsed()))
+                .balanceAsOf(balanceAsOf.setScale(MONEY_SCALE, RoundingMode.HALF_UP))
                 .build();
     }
 
