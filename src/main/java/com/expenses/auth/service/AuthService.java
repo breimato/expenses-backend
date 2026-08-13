@@ -34,6 +34,7 @@ public class AuthService {
             new DefaultCategory("Transporte", "#3B82F6", "🚌", MovementType.EXPENSE),
             new DefaultCategory("Ocio", "#8B5CF6", "🎮", MovementType.EXPENSE),
             new DefaultCategory("Hogar", "#22C55E", "🏠", MovementType.EXPENSE),
+            new DefaultCategory("Ahorros", "#0EA5E9", "💰", MovementType.EXPENSE),
             new DefaultCategory("Otros", "#6B7280", "📦", MovementType.EXPENSE),
             new DefaultCategory("Salario", "#16A34A", "wallet", MovementType.INCOME),
             new DefaultCategory("Reembolso", "#0D9488", "refresh", MovementType.INCOME),
@@ -132,6 +133,10 @@ public class AuthService {
                 .build();
     }
 
-    private record DefaultCategory(String name, String color, String icon, MovementType movementType) {
+    private record DefaultCategory(
+            String name,
+            String color,
+            String icon,
+            MovementType movementType) {
     }
 }

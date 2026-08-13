@@ -5,12 +5,16 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.auth.repository.UserJpaMapper;
 import com.expenses.auth.service.CurrentUserService;
 import com.expenses.category.entity.CategoryEntity;
 import com.expenses.category.repository.CategoryJpaMapper;
+import com.expenses.common.exception.AuthException;
+import com.expenses.common.exception.constants.ExceptionMessageConstants;
 import com.expenses.expense.repository.CategorySpendAggregate;
 import com.expenses.expense.repository.ExpenseJpaMapper;
 import com.expenses.profile.repository.ProfileRepository;
@@ -30,6 +34,9 @@ public class AnalyticsRepository {
 
     /** The profile repository. */
     private final ProfileRepository profileRepository;
+
+    /** The user jpa mapper. */
+    private final UserJpaMapper userJpaMapper;
 
     /** The current user service. */
     private final CurrentUserService currentUserService;
@@ -59,6 +66,38 @@ public class AnalyticsRepository {
     public Optional<LocalDate> findFirstMovementDate() {
 
         return this.expenseJpaMapper.findMinExpenseDateByUserId(this.currentUserService.getRequiredUserId());
+    }
+
+    /**
+     * Find earliest movement date for the current user within a date range.
+     *
+     * @param dateFrom the date from
+     * @param dateTo the date to
+     * @return the optional first movement date in range
+     */
+    @Transactional(readOnly = true)
+    public Optional<LocalDate> findFirstMovementDateInRange(final LocalDate dateFrom, final LocalDate dateTo) {
+
+        return this.expenseJpaMapper.findMinExpenseDateByUserIdAndExpenseDateBetween(
+                this.currentUserService.getRequiredUserId(),
+                dateFrom,
+                dateTo);
+    }
+
+    /**
+     * Get account creation date for the current user.
+     *
+     * @return the created at local date
+     */
+    @Transactional(readOnly = true)
+    public LocalDate getCurrentUserCreatedOn() {
+
+        final var userId = this.currentUserService.getRequiredUserId();
+        final var userEntity = this.userJpaMapper.findById(userId)
+                .orElseThrow(() -> new AuthException(
+                        ExceptionMessageConstants.AUTH_UNAUTHORIZED,
+                        HttpStatus.UNAUTHORIZED));
+        return userEntity.getCreatedAt().toLocalDate();
     }
 
     /**

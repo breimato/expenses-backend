@@ -31,37 +31,59 @@ class AnalyticsServiceTest {
     @InjectMocks
     AnalyticsService analyticsService;
 
-    /** Test compute averages when first movement is mid month then divide by days since that date. */
+    /** Test compute averages when onboarding month and first movement mid month. */
     @Test
-    void testComputeAverages_whenFirstMovementIsMidMonth_thenAverageUsesDaysSinceFirstMovement() {
+    void testComputeAverages_whenOnboardingMonthAndFirstMovementMidMonth_thenAverageUsesDaysSinceFirstMovement() {
 
         // Given
         final var referenceDate = LocalDate.of(2026, 8, 14);
         final var monthStart = LocalDate.of(2026, 8, 1);
         final var firstMovementDate = LocalDate.of(2026, 8, 14);
         final var netSpending = new BigDecimal("10.00");
-        when(this.analyticsRepository.findFirstMovementDate()).thenReturn(Optional.of(firstMovementDate));
+        when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 8, 10));
+        when(this.analyticsRepository.findFirstMovementDateInRange(monthStart, referenceDate))
+                .thenReturn(Optional.of(firstMovementDate));
         when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
 
         // When
         final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
 
         // Then
-        verify(this.analyticsRepository, times(1)).findFirstMovementDate();
-        verify(this.analyticsRepository, times(1)).sumNetSpendingByDateRange(monthStart, referenceDate);
+        verify(this.analyticsRepository, times(1)).getCurrentUserCreatedOn();
+        verify(this.analyticsRepository, times(1)).findFirstMovementDateInRange(monthStart, referenceDate);
         assertEquals(new BigDecimal("10.00"), analyticsAveragesResult.dailyAverage());
     }
 
-    /** Test compute averages when first movement was before month then keep calendar month days. */
+    /** Test compute averages when later month then always divide by day of month from day 1. */
     @Test
-    void testComputeAverages_whenFirstMovementBeforeMonth_thenAverageUsesDayOfMonth() {
+    void testComputeAverages_whenLaterMonth_thenAverageUsesCalendarDaysFromDayOne() {
+
+        // Given
+        final var referenceDate = LocalDate.of(2026, 9, 14);
+        final var monthStart = LocalDate.of(2026, 9, 1);
+        final var netSpending = new BigDecimal("140.00");
+        when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 8, 10));
+        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
+
+        // When
+        final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
+
+        // Then
+        assertEquals(new BigDecimal("10.00"), analyticsAveragesResult.dailyAverage());
+    }
+
+    /** Test compute averages when onboarding month ignores prior-month backfill for period start. */
+    @Test
+    void testComputeAverages_whenOnboardingMonthWithPriorBackfill_thenStillUsesFirstMovementInMonth() {
 
         // Given
         final var referenceDate = LocalDate.of(2026, 8, 14);
         final var monthStart = LocalDate.of(2026, 8, 1);
-        final var firstMovementDate = LocalDate.of(2026, 7, 20);
-        final var netSpending = new BigDecimal("140.00");
-        when(this.analyticsRepository.findFirstMovementDate()).thenReturn(Optional.of(firstMovementDate));
+        final var firstMovementInMonth = LocalDate.of(2026, 8, 10);
+        final var netSpending = new BigDecimal("50.00");
+        when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 8, 1));
+        when(this.analyticsRepository.findFirstMovementDateInRange(monthStart, referenceDate))
+                .thenReturn(Optional.of(firstMovementInMonth));
         when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
 
         // When
@@ -78,7 +100,7 @@ class AnalyticsServiceTest {
         // Given
         final var referenceDate = LocalDate.of(2026, 8, 14);
         final var monthStart = LocalDate.of(2026, 8, 1);
-        when(this.analyticsRepository.findFirstMovementDate()).thenReturn(Optional.empty());
+        when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 7, 1));
         when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(BigDecimal.ZERO);
 
         // When

@@ -47,6 +47,7 @@ public final class ExceptionMessageConstants {
 
     /** The Constant DATA_INTEGRITY_ERROR. */
     public static final String DATA_INTEGRITY_ERROR = "EXP-GENERAL-003 | La operación viola restricciones de datos";
+
     private ExceptionMessageConstants() {
     }
 }

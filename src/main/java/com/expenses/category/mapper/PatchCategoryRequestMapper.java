@@ -22,6 +22,10 @@ public interface PatchCategoryRequestMapper {
      * @param categoryEntity the category entity
      */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "icon", source = "icon", qualifiedByName = "unmapString")
     void updateCategoryEntity(PatchCategoryV1RequestDto patchCategoryV1RequestDto, @MappingTarget CategoryEntity categoryEntity);
 }

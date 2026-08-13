@@ -85,6 +85,26 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
     Optional<LocalDate> findMinExpenseDateByUserId(@Param("userId") Integer userId);
 
     /**
+     * Find the earliest movement date for user within a date range.
+     *
+     * @param userId the user id
+     * @param dateFrom the date from
+     * @param dateTo the date to
+     * @return the optional earliest expense date in range
+     */
+    @Query("""
+            SELECT MIN(expenseEntity.expenseDate)
+            FROM ExpenseEntity expenseEntity
+            WHERE expenseEntity.userId = :userId
+              AND expenseEntity.expenseDate >= :dateFrom
+              AND expenseEntity.expenseDate <= :dateTo
+            """)
+    Optional<LocalDate> findMinExpenseDateByUserIdAndExpenseDateBetween(
+            @Param("userId") Integer userId,
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo);
+
+    /**
      * Sum expense amounts by category for user in date range.
      *
      * @param userId the user id

@@ -3,6 +3,7 @@ package com.expenses.analytics.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class AnalyticsService {
 
     /**
      * Compute daily average net spending for the current month ending on the reference date.
-     * Days counted start at the first movement of the account within the month (not day 1).
+     * Onboarding month starts at the first movement that month; later months start on day 1.
      *
      * @param referenceDate the reference date
      * @return the analytics averages result
@@ -144,21 +145,19 @@ public class AnalyticsService {
      */
     private MonthSpendingPace resolveMonthSpendingPace(final LocalDate referenceDate) {
 
-        final var periodStart = this.resolvePeriodStart(referenceDate.withDayOfMonth(1), referenceDate);
-
-        final var netSpending = this.analyticsRepository.sumNetSpendingByDateRange(referenceDate.withDayOfMonth(1), referenceDate);
-
+        final var monthStart = referenceDate.withDayOfMonth(1);
+        final var periodStart = this.resolvePeriodStart(monthStart, referenceDate);
+        final var netSpending = this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate);
         final var daysElapsed = this.countInclusiveDays(periodStart, referenceDate);
-
-        final var activeDaysInMonth = this.countInclusiveDays(periodStart, referenceDate.withDayOfMonth(referenceDate.lengthOfMonth()));
-
+        final var activeDaysInMonth = this.countInclusiveDays(
+                periodStart,
+                referenceDate.withDayOfMonth(referenceDate.lengthOfMonth()));
         final var daysRemainingInMonth = referenceDate.lengthOfMonth() - referenceDate.getDayOfMonth();
-
         return new MonthSpendingPace(netSpending, daysElapsed, activeDaysInMonth, daysRemainingInMonth);
     }
 
     /**
-     * Resolve period start within the month from the first movement date.
+     * Resolve period start: first movement in onboarding month, otherwise day 1.
      *
      * @param monthStart the month start
      * @param referenceDate the reference date
@@ -166,10 +165,11 @@ public class AnalyticsService {
      */
     private LocalDate resolvePeriodStart(final LocalDate monthStart, final LocalDate referenceDate) {
 
-        return this.analyticsRepository.findFirstMovementDate()
-                .filter(firstMovementDate -> firstMovementDate.isBefore(referenceDate)
-                        || firstMovementDate.isEqual(referenceDate))
-                .map(firstMovementDate -> firstMovementDate.isBefore(monthStart) ? monthStart : firstMovementDate)
+        final var onboardingMonth = YearMonth.from(this.analyticsRepository.getCurrentUserCreatedOn());
+        if (!YearMonth.from(referenceDate).equals(onboardingMonth)) {
+            return monthStart;
+        }
+        return this.analyticsRepository.findFirstMovementDateInRange(monthStart, referenceDate)
                 .orElse(referenceDate);
     }
 
