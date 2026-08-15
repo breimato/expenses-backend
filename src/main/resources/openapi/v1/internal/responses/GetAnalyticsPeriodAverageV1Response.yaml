@@ -1,0 +1,5 @@
+description: "Get Analytics Period Average V1 Response"
+type: object
+properties:
+  analyticsPeriodAverage:
+    $ref: '../components/AnalyticsPeriodAverageV1.yaml'

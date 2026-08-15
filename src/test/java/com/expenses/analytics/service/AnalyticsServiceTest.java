@@ -1,6 +1,7 @@
 package com.expenses.analytics.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,9 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import com.expenses.analytics.repository.AnalyticsRepository;
 import com.expenses.category.entity.CategoryEntity;
+import com.expenses.common.exception.ExpenseException;
+import com.expenses.common.exception.constants.ExceptionMessageConstants;
 import com.expenses.expense.repository.CategorySpendAggregate;
 
 /** The Class Analytics Service Test. */
@@ -154,5 +158,60 @@ class AnalyticsServiceTest {
         assertEquals(new BigDecimal("75.00"), analyticsCategoryBreakdownResult.items().get(0).percent());
         assertEquals(new BigDecimal("25.00"), analyticsCategoryBreakdownResult.items().get(1).percent());
         assertEquals("Comida", analyticsCategoryBreakdownResult.items().get(0).categoryName());
+    }
+
+    /** Test compute period average when range is valid then divides by inclusive days. */
+    @Test
+    void testComputePeriodAverage_whenRangeValid_thenDividesByInclusiveDays() {
+
+        // Given
+        final var dateFrom = LocalDate.of(2026, 8, 1);
+        final var dateTo = LocalDate.of(2026, 8, 10);
+        when(this.analyticsRepository.sumNetSpendingByDateRange(dateFrom, dateTo))
+                .thenReturn(new BigDecimal("100.00"));
+
+        // When
+        final var analyticsPeriodAverageResult = this.analyticsService.computePeriodAverage(dateFrom, dateTo);
+
+        // Then
+        assertEquals(new BigDecimal("10.00"), analyticsPeriodAverageResult.dailyAverage());
+        assertEquals(new BigDecimal("100.00"), analyticsPeriodAverageResult.totalNetSpending());
+        assertEquals(10, analyticsPeriodAverageResult.daysInPeriod());
+        assertEquals(dateFrom, analyticsPeriodAverageResult.dateFrom());
+        assertEquals(dateTo, analyticsPeriodAverageResult.dateTo());
+    }
+
+    /** Test compute period average when single day then average equals total. */
+    @Test
+    void testComputePeriodAverage_whenSingleDay_thenAverageEqualsTotal() {
+
+        // Given
+        final var dateFrom = LocalDate.of(2026, 8, 15);
+        final var dateTo = LocalDate.of(2026, 8, 15);
+        when(this.analyticsRepository.sumNetSpendingByDateRange(dateFrom, dateTo))
+                .thenReturn(new BigDecimal("42.50"));
+
+        // When
+        final var analyticsPeriodAverageResult = this.analyticsService.computePeriodAverage(dateFrom, dateTo);
+
+        // Then
+        assertEquals(new BigDecimal("42.50"), analyticsPeriodAverageResult.dailyAverage());
+        assertEquals(1, analyticsPeriodAverageResult.daysInPeriod());
+    }
+
+    /** Test compute period average when dateFrom after dateTo then bad request. */
+    @Test
+    void testComputePeriodAverage_whenDateFromAfterDateTo_thenThrowsBadRequest() {
+
+        // Given
+        final var dateFrom = LocalDate.of(2026, 8, 20);
+        final var dateTo = LocalDate.of(2026, 8, 10);
+
+        // When / Then
+        final var expenseException = assertThrows(
+                ExpenseException.class,
+                () -> this.analyticsService.computePeriodAverage(dateFrom, dateTo));
+        assertEquals(ExceptionMessageConstants.ANALYTICS_INVALID_DATE_RANGE, expenseException.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, expenseException.getHttpStatus());
     }
 }

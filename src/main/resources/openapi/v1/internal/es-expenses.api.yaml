@@ -42,6 +42,8 @@ paths:
     $ref: './expenses/analytics-projections-v1.api.yaml'
   /v1/expenses/analytics/category-breakdown:
     $ref: './expenses/analytics-category-breakdown-v1.api.yaml'
+  /v1/expenses/analytics/period-average:
+    $ref: './expenses/analytics-period-average-v1.api.yaml'
 
 components:
   securitySchemes:
@@ -74,6 +76,8 @@ components:
       $ref: './components/AnalyticsProjectionsV1.yaml'
     AnalyticsCategorySpendItemV1:
       $ref: './components/AnalyticsCategorySpendItemV1.yaml'
+    AnalyticsPeriodAverageV1:
+      $ref: './components/AnalyticsPeriodAverageV1.yaml'
     PostCategoryV1Request:
       $ref: './requests/PostCategoryV1Request.yaml'
     PatchCategoryV1Request:
@@ -94,6 +98,8 @@ components:
       $ref: './requests/GetAnalyticsAveragesV1Request.yaml'
     GetAnalyticsProjectionsV1Request:
       $ref: './requests/GetAnalyticsProjectionsV1Request.yaml'
+    GetAnalyticsPeriodAverageV1Request:
+      $ref: './requests/GetAnalyticsPeriodAverageV1Request.yaml'
     CategoryV1Response:
       $ref: './responses/CategoryV1Response.yaml'
     GetCategoriesV1Response:
@@ -114,6 +120,8 @@ components:
       $ref: './responses/GetAnalyticsProjectionsV1Response.yaml'
     GetAnalyticsCategoryBreakdownV1Response:
       $ref: './responses/GetAnalyticsCategoryBreakdownV1Response.yaml'
+    GetAnalyticsPeriodAverageV1Response:
+      $ref: './responses/GetAnalyticsPeriodAverageV1Response.yaml'
     PostRecurringTemplatesApplyPendingV1Response:
       $ref: './responses/PostRecurringTemplatesApplyPendingV1Response.yaml'
     MovementTypeV1:

@@ -1,0 +1,14 @@
+description: "Get Analytics Period Average V1 Request"
+type: object
+required:
+  - dateFrom
+  - dateTo
+properties:
+  dateFrom:
+    type: string
+    format: date
+    description: "Inclusive start date of the average period"
+  dateTo:
+    type: string
+    format: date
+    description: "Inclusive end date of the average period"

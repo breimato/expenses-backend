@@ -48,6 +48,10 @@ public final class ExceptionMessageConstants {
     /** The Constant DATA_INTEGRITY_ERROR. */
     public static final String DATA_INTEGRITY_ERROR = "EXP-GENERAL-003 | La operación viola restricciones de datos";
 
+    /** The Constant ANALYTICS_INVALID_DATE_RANGE. */
+    public static final String ANALYTICS_INVALID_DATE_RANGE =
+            "EXP-ANALYTICS-001 | La fecha de inicio no puede ser posterior a la fecha de fin";
+
     private ExceptionMessageConstants() {
     }
 }

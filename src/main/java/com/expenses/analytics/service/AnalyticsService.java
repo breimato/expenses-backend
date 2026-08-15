@@ -11,15 +11,19 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.expenses.analytics.model.AnalyticsAveragesResult;
 import com.expenses.analytics.model.AnalyticsCategoryBreakdownResult;
 import com.expenses.analytics.model.AnalyticsCategorySpendItemResult;
+import com.expenses.analytics.model.AnalyticsPeriodAverageResult;
 import com.expenses.analytics.model.AnalyticsProjectionsResult;
 import com.expenses.analytics.repository.AnalyticsRepository;
 import com.expenses.category.entity.CategoryEntity;
+import com.expenses.common.exception.ExpenseException;
+import com.expenses.common.exception.constants.ExceptionMessageConstants;
 import com.expenses.expense.repository.CategorySpendAggregate;
 
 import lombok.RequiredArgsConstructor;
@@ -61,6 +65,32 @@ public class AnalyticsService {
         return AnalyticsAveragesResult.builder()
                 .dailyAverage(this.divide(monthSpendingPace.netSpending(), monthSpendingPace.daysElapsed()))
                 .balanceAsOf(balanceAsOf.setScale(MONEY_SCALE, RoundingMode.HALF_UP))
+                .build();
+    }
+
+    /**
+     * Compute daily average net spending for an inclusive date range.
+     *
+     * @param dateFrom the inclusive start date
+     * @param dateTo the inclusive end date
+     * @return the analytics period average result
+     */
+    @Transactional(readOnly = true)
+    public AnalyticsPeriodAverageResult computePeriodAverage(final LocalDate dateFrom, final LocalDate dateTo) {
+
+        if (Objects.isNull(dateFrom) || Objects.isNull(dateTo) || dateFrom.isAfter(dateTo)) {
+            throw new ExpenseException(ExceptionMessageConstants.ANALYTICS_INVALID_DATE_RANGE, HttpStatus.BAD_REQUEST);
+        }
+        final var totalNetSpending = Objects.requireNonNullElse(
+                this.analyticsRepository.sumNetSpendingByDateRange(dateFrom, dateTo),
+                BigDecimal.ZERO);
+        final var daysInPeriod = this.countInclusiveDays(dateFrom, dateTo);
+        return AnalyticsPeriodAverageResult.builder()
+                .dailyAverage(this.divide(totalNetSpending, daysInPeriod))
+                .totalNetSpending(totalNetSpending.setScale(MONEY_SCALE, RoundingMode.HALF_UP))
+                .daysInPeriod(daysInPeriod)
+                .dateFrom(dateFrom)
+                .dateTo(dateTo)
                 .build();
     }
 

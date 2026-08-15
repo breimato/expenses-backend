@@ -1,0 +1,31 @@
+post:
+  summary: "Get Analytics Period Average V1"
+  description: "Get daily average net spending for an inclusive date range"
+  operationId: "GetAnalyticsPeriodAverageV1"
+  tags:
+    - get-analytics-period-average-v1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/GetAnalyticsPeriodAverageV1Request.yaml'
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/GetAnalyticsPeriodAverageV1Response.yaml'
+    '400':
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

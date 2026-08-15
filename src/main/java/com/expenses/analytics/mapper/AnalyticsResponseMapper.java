@@ -6,13 +6,16 @@ import org.mapstruct.Mapping;
 import com.expenses.analytics.model.AnalyticsAveragesResult;
 import com.expenses.analytics.model.AnalyticsCategoryBreakdownResult;
 import com.expenses.analytics.model.AnalyticsCategorySpendItemResult;
+import com.expenses.analytics.model.AnalyticsPeriodAverageResult;
 import com.expenses.analytics.model.AnalyticsProjectionsResult;
 import com.expenses.api.dto.AnalyticsAveragesV1Dto;
 import com.expenses.api.dto.AnalyticsCategorySpendItemV1Dto;
+import com.expenses.api.dto.AnalyticsPeriodAverageV1Dto;
 import com.expenses.api.dto.AnalyticsProjectionsV1Dto;
 import com.expenses.api.dto.GetAnalyticsAveragesV1ResponseDto;
 import com.expenses.api.dto.GetAnalyticsCategoryBreakdownV1ResponseAnalyticsCategoryBreakdown;
 import com.expenses.api.dto.GetAnalyticsCategoryBreakdownV1ResponseDto;
+import com.expenses.api.dto.GetAnalyticsPeriodAverageV1ResponseDto;
 import com.expenses.api.dto.GetAnalyticsProjectionsV1ResponseDto;
 import com.expenses.common.DecimalMapper;
 
@@ -41,6 +44,29 @@ public interface AnalyticsResponseMapper {
 
         return GetAnalyticsAveragesV1ResponseDto.builder()
                 .analyticsAverages(this.toAnalyticsAveragesV1Dto(analyticsAveragesResult))
+                .build();
+    }
+
+    /**
+     * To analytics period average v1 dto.
+     *
+     * @param analyticsPeriodAverageResult the analytics period average result
+     * @return the analytics period average v1 dto
+     */
+    AnalyticsPeriodAverageV1Dto toAnalyticsPeriodAverageV1Dto(
+            AnalyticsPeriodAverageResult analyticsPeriodAverageResult);
+
+    /**
+     * To get analytics period average v1 response.
+     *
+     * @param analyticsPeriodAverageResult the analytics period average result
+     * @return the get analytics period average v1 response dto
+     */
+    default GetAnalyticsPeriodAverageV1ResponseDto toGetAnalyticsPeriodAverageV1Response(
+            final AnalyticsPeriodAverageResult analyticsPeriodAverageResult) {
+
+        return GetAnalyticsPeriodAverageV1ResponseDto.builder()
+                .analyticsPeriodAverage(this.toAnalyticsPeriodAverageV1Dto(analyticsPeriodAverageResult))
                 .build();
     }
 
