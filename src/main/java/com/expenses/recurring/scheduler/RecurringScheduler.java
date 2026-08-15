@@ -26,28 +26,28 @@ public class RecurringScheduler {
     @Value("${expenses.recurring.apply-on-startup:false}")
     private boolean applyOnStartup;
 
-    /** Apply pending recurring templates daily at 07:00. */
+    /** Apply templates due on today's day of month at 07:00. */
     @Scheduled(cron = "0 0 7 * * *")
-    public void applyPendingDaily() {
+    public void applyDueTodayDaily() {
 
-        this.applyPending("scheduled");
+        this.applyDueToday("scheduled");
     }
 
-    /** Apply pending recurring templates on startup. */
+    /** Apply templates due on today's day of month on startup. */
     @EventListener(ApplicationReadyEvent.class)
-    public void applyPendingOnStartup() {
+    public void applyDueTodayOnStartup() {
 
         if (!this.applyOnStartup) {
             return;
         }
-        this.applyPending("startup");
+        this.applyDueToday("startup");
     }
 
-    private void applyPending(final String trigger) {
+    private void applyDueToday(final String trigger) {
 
-        final var appliedCount = this.recurringApplicationService.applyPending(LocalDate.now());
+        final var appliedCount = this.recurringApplicationService.applyDueToday(LocalDate.now());
         if (appliedCount > 0) {
-            log.info("Applied {} recurring template(s) on {}", appliedCount, trigger);
+            log.info("Applied {} recurring template(s) due today on {}", appliedCount, trigger);
         }
     }
 }

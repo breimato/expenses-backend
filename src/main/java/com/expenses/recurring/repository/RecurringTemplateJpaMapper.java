@@ -40,7 +40,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
             @Param("categoryId") Integer categoryId);
 
     /**
-     * Find auto-apply monthly templates due on or before the given day of month.
+     * Find auto-apply monthly templates scheduled for an exact day of month (daily scheduler).
      *
      * @param frequency the frequency
      * @param dayOfMonth the day of month
@@ -52,7 +52,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
               AND recurringTemplateEntity.autoApply = true
               AND recurringTemplateEntity.frequency = :frequency
               AND recurringTemplateEntity.dayOfMonth IS NOT NULL
-              AND recurringTemplateEntity.dayOfMonth <= :dayOfMonth
+              AND recurringTemplateEntity.dayOfMonth = :dayOfMonth
             ORDER BY recurringTemplateEntity.id ASC
             """)
     List<RecurringTemplateEntity> findDueAutoApplyTemplates(
@@ -60,7 +60,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
             @Param("dayOfMonth") int dayOfMonth);
 
     /**
-     * Find auto-apply monthly templates due for a specific user.
+     * Find auto-apply monthly templates pending on or before the given day (manual catch-up).
      *
      * @param userId the user id
      * @param frequency the frequency
@@ -77,7 +77,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
               AND recurringTemplateEntity.dayOfMonth <= :dayOfMonth
             ORDER BY recurringTemplateEntity.id ASC
             """)
-    List<RecurringTemplateEntity> findDueAutoApplyTemplatesForUser(
+    List<RecurringTemplateEntity> findPendingAutoApplyTemplatesForUser(
             @Param("userId") Integer userId,
             @Param("frequency") RecurringFrequency frequency,
             @Param("dayOfMonth") int dayOfMonth);

@@ -45,13 +45,13 @@ public class RecurringApplicationService {
     private final CurrentUserService currentUserService;
 
     /**
-     * Apply all due recurring templates for all users (scheduler).
+     * Apply templates scheduled for this exact day (daily scheduler).
      *
      * @param referenceDate the reference date
      * @return the number of templates applied
      */
     @Transactional
-    public int applyPending(final LocalDate referenceDate) {
+    public int applyDueToday(final LocalDate referenceDate) {
 
         return this.applyTemplates(
                 this.recurringTemplateJpaMapper.findDueAutoApplyTemplates(
@@ -61,7 +61,7 @@ public class RecurringApplicationService {
     }
 
     /**
-     * Apply due recurring templates for the current authenticated user.
+     * Apply pending templates due on or before today for the current user (manual catch-up).
      *
      * @param referenceDate the reference date
      * @return the number of templates applied
@@ -70,7 +70,7 @@ public class RecurringApplicationService {
     public int applyPendingForCurrentUser(final LocalDate referenceDate) {
 
         return this.applyTemplates(
-                this.recurringTemplateJpaMapper.findDueAutoApplyTemplatesForUser(
+                this.recurringTemplateJpaMapper.findPendingAutoApplyTemplatesForUser(
                         this.currentUserService.getRequiredUserId(),
                         RecurringFrequency.MONTHLY,
                         referenceDate.getDayOfMonth()),

@@ -1,6 +1,6 @@
 post:
   summary: "Post Recurring Applications V1"
-  description: "Create recurring applications due for the current period"
+  description: "Catch up auto-apply templates scheduled on or before today that were not applied yet this period"
   operationId: "PostRecurringTemplatesApplyPendingV1"
   tags:
     - recurring-applications-v1
