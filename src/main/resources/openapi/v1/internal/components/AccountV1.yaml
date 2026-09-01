@@ -1,0 +1,16 @@
+description: "Account V1"
+type: object
+properties:
+  id:
+    type: integer
+    format: int32
+    description: "Account id"
+  name:
+    type: string
+    description: "Account display name"
+  isDefault:
+    type: boolean
+    description: "Whether this is the user's default account"
+  balance:
+    type: string
+    description: "Computed account balance from all recorded movements as decimal string"

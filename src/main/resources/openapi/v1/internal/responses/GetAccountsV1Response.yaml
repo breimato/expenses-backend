@@ -1,0 +1,7 @@
+description: "Get Accounts V1 Response"
+type: object
+properties:
+  accounts:
+    type: array
+    items:
+      $ref: '../components/AccountV1.yaml'

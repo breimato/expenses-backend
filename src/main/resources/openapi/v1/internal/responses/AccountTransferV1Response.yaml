@@ -1,0 +1,5 @@
+description: "Account Transfer V1 Response"
+type: object
+properties:
+  transfer:
+    $ref: '../components/AccountTransferV1.yaml'

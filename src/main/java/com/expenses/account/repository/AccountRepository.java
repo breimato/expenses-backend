@@ -1,0 +1,133 @@
+package com.expenses.account.repository;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.expenses.account.entity.AccountEntity;
+import com.expenses.account.service.AccountAccessService;
+import com.expenses.api.dto.PatchAccountV1RequestDto;
+import com.expenses.api.dto.PostAccountV1RequestDto;
+import com.expenses.auth.service.CurrentUserService;
+import com.expenses.category.service.CategorySeedService;
+import com.expenses.expense.repository.ExpenseJpaMapper;
+
+import lombok.RequiredArgsConstructor;
+
+/** The Class Account Repository. */
+@Component
+@RequiredArgsConstructor
+public class AccountRepository {
+
+    /** The account jpa mapper. */
+    private final AccountJpaMapper accountJpaMapper;
+
+    /** The expense jpa mapper. */
+    private final ExpenseJpaMapper expenseJpaMapper;
+
+    /** The current user service. */
+    private final CurrentUserService currentUserService;
+
+    /** The account access service. */
+    private final AccountAccessService accountAccessService;
+
+    /** The category seed service. */
+    private final CategorySeedService categorySeedService;
+
+    /**
+     * Find all accounts for current user.
+     *
+     * @return the list
+     */
+    @Transactional(readOnly = true)
+    public List<AccountEntity> findAllForCurrentUser() {
+
+        return this.accountJpaMapper.findByUserIdOrderByIsDefaultDescNameAsc(
+                this.currentUserService.getRequiredUserId());
+    }
+
+    /**
+     * Find by id for current user.
+     *
+     * @param accountId the account id
+     * @return the account entity
+     */
+    @Transactional(readOnly = true)
+    public AccountEntity findById(final Integer accountId) {
+
+        return this.accountAccessService.requireAccountAccess(accountId);
+    }
+
+    /**
+     * Create default account for user.
+     *
+     * @param userId the user id
+     * @param displayName the display name
+     * @return the account entity
+     */
+    @Transactional
+    public AccountEntity createDefaultAccount(final Integer userId, final String displayName) {
+
+        final var accountEntity = new AccountEntity();
+        accountEntity.setUserId(userId);
+        accountEntity.setName(displayName);
+        accountEntity.setDefault(true);
+        final var savedAccountEntity = this.accountJpaMapper.save(accountEntity);
+        this.categorySeedService.seedDefaultCategories(userId, savedAccountEntity.getId());
+        return savedAccountEntity;
+    }
+
+    /**
+     * Create account for current user.
+     *
+     * @param postAccountV1RequestDto the post account v1 request dto
+     * @return the account entity
+     */
+    @Transactional
+    public AccountEntity create(final PostAccountV1RequestDto postAccountV1RequestDto) {
+
+        final var userId = this.currentUserService.getRequiredUserId();
+        final var accountEntity = new AccountEntity();
+        accountEntity.setUserId(userId);
+        accountEntity.setName(postAccountV1RequestDto.getName().trim());
+        accountEntity.setDefault(false);
+        final var savedAccountEntity = this.accountJpaMapper.save(accountEntity);
+        this.categorySeedService.seedDefaultCategories(userId, savedAccountEntity.getId());
+        return savedAccountEntity;
+    }
+
+    /**
+     * Update account for current user.
+     *
+     * @param accountId the account id
+     * @param patchAccountV1RequestDto the patch account v1 request dto
+     * @return the account entity
+     */
+    @Transactional
+    public AccountEntity update(final Integer accountId, final PatchAccountV1RequestDto patchAccountV1RequestDto) {
+
+        final var accountEntity = this.accountAccessService.requireAccountAccess(accountId);
+        if (Objects.nonNull(patchAccountV1RequestDto.getName())) {
+            accountEntity.setName(patchAccountV1RequestDto.getName().trim());
+        }
+        return this.accountJpaMapper.save(accountEntity);
+    }
+
+    /**
+     * Get balance for account.
+     *
+     * @param accountId the account id
+     * @return the balance
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal getBalance(final Integer accountId) {
+
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.expenseJpaMapper.sumNetBalance(
+                this.currentUserService.getRequiredUserId(),
+                accountId);
+    }
+}

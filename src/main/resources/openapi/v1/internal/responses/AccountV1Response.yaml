@@ -1,0 +1,5 @@
+description: "Account V1 Response"
+type: object
+properties:
+  account:
+    $ref: '../components/AccountV1.yaml'

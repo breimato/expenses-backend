@@ -1,0 +1,7 @@
+description: "Patch Account V1 Request"
+type: object
+properties:
+  name:
+    type: string
+    maxLength: 100
+    description: "Account display name"

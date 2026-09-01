@@ -1,0 +1,44 @@
+get:
+  summary: "Get Accounts V1"
+  description: "List all accounts for the authenticated user"
+  operationId: "GetAccountsV1"
+  tags:
+    - get-accounts-v1
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/GetAccountsV1Response.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+post:
+  summary: "Post Account V1"
+  description: "Create a new account with default categories"
+  operationId: "PostAccountV1"
+  tags:
+    - post-account-v1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/PostAccountV1Request.yaml'
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/AccountV1Response.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

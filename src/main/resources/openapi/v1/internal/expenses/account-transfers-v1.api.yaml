@@ -1,0 +1,31 @@
+post:
+  summary: "Post Account Transfer V1"
+  description: "Transfer money between two accounts owned by the user"
+  operationId: "PostAccountTransferV1"
+  tags:
+    - post-account-transfer-v1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../requests/PostAccountTransferV1Request.yaml'
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/AccountTransferV1Response.yaml'
+    '400':
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

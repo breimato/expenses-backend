@@ -1,0 +1,24 @@
+description: "Post Account Transfer V1 Request"
+type: object
+required:
+  - fromAccountId
+  - toAccountId
+  - amount
+  - transferDate
+  - description
+properties:
+  fromAccountId:
+    type: integer
+    format: int32
+  toAccountId:
+    type: integer
+    format: int32
+  amount:
+    type: string
+    description: "Transfer amount as decimal string"
+  transferDate:
+    type: string
+    format: date
+  description:
+    type: string
+    maxLength: 500

@@ -1,0 +1,7 @@
+description: "Account id query parameter"
+name: accountId
+in: query
+required: true
+schema:
+  type: integer
+  format: int32
