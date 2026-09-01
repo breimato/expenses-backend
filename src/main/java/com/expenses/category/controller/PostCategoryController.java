@@ -26,9 +26,11 @@ public class PostCategoryController implements PostCategoryV1Api {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<CategoryV1ResponseDto> postCategoryV1(final PostCategoryV1RequestDto postCategoryV1RequestDto) {
+    public ResponseEntity<CategoryV1ResponseDto> postCategoryV1(
+            final Integer accountId,
+            final PostCategoryV1RequestDto postCategoryV1RequestDto) {
 
-        final var categoryEntity = this.categoryRepository.create(postCategoryV1RequestDto);
+        final var categoryEntity = this.categoryRepository.create(accountId, postCategoryV1RequestDto);
         final var categoryV1ResponseDto = this.categoryResponseMapper.toCategoryV1Response(categoryEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryV1ResponseDto);
     }

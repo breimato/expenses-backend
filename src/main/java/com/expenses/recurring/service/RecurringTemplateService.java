@@ -37,14 +37,15 @@ public class RecurringTemplateService {
      */
     @Transactional
     public ExpenseEntity quickAdd(
+            final Integer accountId,
             final Integer id,
             final PostRecurringTemplateQuickAddV1RequestDto postRecurringTemplateQuickAddV1RequestDto) {
 
-        final var recurringTemplateEntity = this.recurringTemplateRepository.findById(id);
+        final var recurringTemplateEntity = this.recurringTemplateRepository.findById(accountId, id);
         final var postExpenseV1RequestDto = this.buildPostExpenseRequest(
                 recurringTemplateEntity,
                 postRecurringTemplateQuickAddV1RequestDto);
-        final var expenseEntity = this.expenseRepository.create(postExpenseV1RequestDto);
+        final var expenseEntity = this.expenseRepository.create(accountId, postExpenseV1RequestDto);
         this.recurringApplicationService.recordManualApplicationIfMonthly(
                 recurringTemplateEntity,
                 expenseEntity,

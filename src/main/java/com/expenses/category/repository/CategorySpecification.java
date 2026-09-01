@@ -27,6 +27,7 @@ public final class CategorySpecification {
      */
     public static Specification<CategoryEntity> withFilters(
             final Integer userId,
+            final Integer accountId,
             final Integer id,
             final String name,
             final MovementType movementType) {
@@ -34,6 +35,7 @@ public final class CategorySpecification {
         return (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
+            predicates.add(criteriaBuilder.equal(root.get("accountId"), accountId));
             if (id != null) {
                 predicates.add(criteriaBuilder.equal(root.get("id"), id));
             }

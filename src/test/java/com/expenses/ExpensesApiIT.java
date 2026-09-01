@@ -31,11 +31,13 @@ class ExpensesApiIT extends IntegrationTestSupport {
 
     private String accessToken;
 
+    private Integer accountId;
+
     private Integer expenseCategoryId;
 
     private Integer incomeCategoryId;
 
-    /** Register a user and capture token plus first expense category. */
+    /** Register a user and capture token plus default account and categories. */
     @BeforeEach
     void setUpAuthenticatedUser() throws Exception {
 
@@ -55,7 +57,16 @@ class ExpensesApiIT extends IntegrationTestSupport {
         final JsonNode registerBody = this.objectMapper.readTree(registerResult.getResponse().getContentAsString());
         this.accessToken = registerBody.get("accessToken").asText();
 
+        final MvcResult accountsResult = this.mockMvc.perform(get("/v1/expenses/accounts")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        final JsonNode accounts = this.objectMapper.readTree(accountsResult.getResponse().getContentAsString())
+                .get("accounts");
+        this.accountId = accounts.get(0).get("id").asInt();
+
         final MvcResult categoriesResult = this.mockMvc.perform(get("/v1/expenses/categories")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -80,6 +91,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void getExpensesWithoutFiltersReturnsOk() throws Exception {
 
         this.mockMvc.perform(get("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.expenses").isArray());
@@ -90,9 +102,10 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void getCategoriesWithoutMovementTypeReturnsIncomeAndExpense() throws Exception {
 
         this.mockMvc.perform(get("/v1/expenses/categories")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.categories.length()").value(greaterThanOrEqualTo(8)));
+                .andExpect(jsonPath("$.categories.length()").value(greaterThanOrEqualTo(10)));
     }
 
     /** Test create and delete expense lifecycle. */
@@ -100,6 +113,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void createAndDeleteExpenseLifecycle() throws Exception {
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -116,11 +130,12 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.expense.id").isNumber());
     }
 
-    /** Test profile balance is computed from movements. */
+    /** Test account balance is computed from movements. */
     @Test
-    void profileBalanceReflectsMovements() throws Exception {
+    void accountBalanceReflectsMovements() throws Exception {
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -134,10 +149,10 @@ class ExpensesApiIT extends IntegrationTestSupport {
                                 """.formatted(this.expenseCategoryId)))
                 .andExpect(status().isCreated());
 
-        this.mockMvc.perform(get("/v1/expenses/profile")
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + this.accountId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.profile.balance").exists());
+                .andExpect(jsonPath("$.account.balance").value("-100.00"));
     }
 
     /** Test delete category with expenses returns conflict. */
@@ -145,6 +160,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void deleteCategoryInUseReturnsConflict() throws Exception {
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -159,6 +175,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .andExpect(status().isCreated());
 
         this.mockMvc.perform(delete("/v1/expenses/categories/" + this.expenseCategoryId)
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("EXP-CATEGORY-003"));
@@ -173,9 +190,10 @@ class ExpensesApiIT extends IntegrationTestSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
+                                  "accountId": %d,
                                   "referenceDate": "2026-07-05"
                                 }
-                                """))
+                                """.formatted(this.accountId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.analyticsAverages").exists());
 
@@ -184,9 +202,10 @@ class ExpensesApiIT extends IntegrationTestSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
+                                  "accountId": %d,
                                   "referenceDate": "2026-07-05"
                                 }
-                                """))
+                                """.formatted(this.accountId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.analyticsProjections").exists());
     }
@@ -196,6 +215,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void createExpenseExcludedFromAveragePersistsFlag() throws Exception {
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -217,6 +237,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void usersAreIsolated() throws Exception {
 
         final MvcResult createExpenseResult = this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -252,13 +273,25 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .readTree(otherRegisterResult.getResponse().getContentAsString())
                 .get("accessToken")
                 .asText();
+        final int otherAccountId = this.objectMapper
+                .readTree(this.mockMvc.perform(get("/v1/expenses/accounts")
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + otherToken))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString())
+                .get("accounts")
+                .get(0)
+                .get("id")
+                .asInt();
 
         this.mockMvc.perform(get("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(otherAccountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + otherToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.expenses.length()").value(0));
 
         this.mockMvc.perform(delete("/v1/expenses/expenses/" + expenseId)
+                        .param("accountId", String.valueOf(otherAccountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + otherToken))
                 .andExpect(status().isNotFound());
     }
@@ -267,7 +300,8 @@ class ExpensesApiIT extends IntegrationTestSupport {
     @Test
     void protectedEndpointWithoutTokenReturnsUnauthorized() throws Exception {
 
-        this.mockMvc.perform(get("/v1/expenses/expenses"))
+        this.mockMvc.perform(get("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -276,6 +310,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void createIncomeLinkedToExpenseNetsCategoryBreakdown() throws Exception {
 
         final MvcResult createExpenseResult = this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -296,6 +331,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .asInt();
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -318,9 +354,10 @@ class ExpensesApiIT extends IntegrationTestSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
+                                  "accountId": %d,
                                   "referenceDate": "2026-07-10"
                                 }
-                                """))
+                                """.formatted(this.accountId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.analyticsCategoryBreakdown.totalSpent").value("60.00"))
                 .andExpect(jsonPath("$.analyticsCategoryBreakdown.items[0].total").value("60.00"));
@@ -331,6 +368,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void createIncomeLinkedToMissingExpenseReturnsNotFound() throws Exception {
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -352,6 +390,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
     void createIncomeLinkedToIncomeReturnsBadRequest() throws Exception {
 
         final MvcResult createIncomeResult = this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -372,6 +411,7 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .asInt();
 
         this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -386,5 +426,91 @@ class ExpensesApiIT extends IntegrationTestSupport {
                                 """.formatted(this.incomeCategoryId, incomeId)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("EXP-EXPENSE-003"));
+    }
+
+    /** Test transfer updates balances on both accounts without affecting spending average. */
+    @Test
+    void transferMovesBalanceBetweenAccounts() throws Exception {
+
+        final MvcResult secondAccountResult = this.mockMvc.perform(post("/v1/expenses/accounts")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Ahorros"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        final int secondAccountId = this.objectMapper
+                .readTree(secondAccountResult.getResponse().getContentAsString())
+                .get("account")
+                .get("id")
+                .asInt();
+
+        this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": %d,
+                                  "amount": "200.00",
+                                  "description": "Income for transfer test",
+                                  "expenseDate": "2026-07-01",
+                                  "movementType": "INCOME"
+                                }
+                                """.formatted(this.incomeCategoryId)))
+                .andExpect(status().isCreated());
+
+        this.mockMvc.perform(post("/v1/expenses/account-transfers")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "fromAccountId": %d,
+                                  "toAccountId": %d,
+                                  "amount": "75.00",
+                                  "transferDate": "2026-07-02",
+                                  "description": "A ahorros"
+                                }
+                                """.formatted(this.accountId, secondAccountId)))
+                .andExpect(status().isCreated());
+
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + this.accountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.account.balance").value("125.00"));
+
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + secondAccountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.account.balance").value("75.00"));
+    }
+
+    /** Test accounts are isolated per user. */
+    @Test
+    void accountsAreIsolatedBetweenUsers() throws Exception {
+
+        final var otherEmail = "acct-" + System.nanoTime() + "@example.com";
+        final String otherToken = this.objectMapper
+                .readTree(this.mockMvc.perform(post("/v1/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "email": "%s",
+                                          "password": "password123",
+                                          "displayName": "Other"
+                                        }
+                                        """.formatted(otherEmail)))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString())
+                .get("accessToken")
+                .asText();
+
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + this.accountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + otherToken))
+                .andExpect(status().isNotFound());
     }
 }

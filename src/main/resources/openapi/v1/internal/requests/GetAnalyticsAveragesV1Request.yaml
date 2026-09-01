@@ -2,7 +2,12 @@ description: "Get Analytics Averages V1 Request"
 type: object
 required:
   - referenceDate
+  - accountId
 properties:
+  accountId:
+    type: integer
+    format: int32
+    description: "Account identifier"
   referenceDate:
     type: string
     format: date

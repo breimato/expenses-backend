@@ -5,6 +5,7 @@ get:
   tags:
     - get-recurring-templates-v1
   parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
     - name: categoryId
       in: query
       required: false
@@ -30,6 +31,8 @@ post:
   operationId: "PostRecurringTemplateV1"
   tags:
     - post-recurring-template-v1
+  parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
   requestBody:
     required: true
     content:

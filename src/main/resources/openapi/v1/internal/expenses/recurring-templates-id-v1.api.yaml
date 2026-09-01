@@ -5,6 +5,7 @@ patch:
   tags:
     - patch-recurring-template-v1
   parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
     - name: id
       in: path
       required: true
@@ -44,6 +45,7 @@ delete:
   tags:
     - delete-recurring-template-v1
   parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
     - name: id
       in: path
       required: true

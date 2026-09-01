@@ -24,11 +24,34 @@ public final class ExceptionMessageConstants {
     public static final String EXPENSE_REIMBURSED_MUST_BE_EXPENSE =
             "EXP-EXPENSE-003 | Solo se puede vincular un reembolso a un movimiento de tipo gasto";
 
+    /** The Constant EXPENSE_TRANSFER_TYPE_IMMUTABLE. */
+    public static final String EXPENSE_TRANSFER_TYPE_IMMUTABLE =
+            "EXP-EXPENSE-004 | No se puede cambiar el tipo de una transferencia";
+
+    /** The Constant EXPENSE_TRANSFER_CATEGORY_IMMUTABLE. */
+    public static final String EXPENSE_TRANSFER_CATEGORY_IMMUTABLE =
+            "EXP-EXPENSE-005 | No se puede cambiar la categoría de una transferencia";
+
     /** The Constant RECURRING_TEMPLATE_NOT_FOUND. */
     public static final String RECURRING_TEMPLATE_NOT_FOUND = "EXP-RECURRING-001 | No se encontró la plantilla recurrente";
 
     /** The Constant PROFILE_NOT_FOUND. */
     public static final String PROFILE_NOT_FOUND = "EXP-PROFILE-001 | No se encontró el perfil";
+
+    /** The Constant ACCOUNT_NOT_FOUND. */
+    public static final String ACCOUNT_NOT_FOUND = "EXP-ACCOUNT-001 | No se encontró la cuenta";
+
+    /** The Constant ACCOUNT_TRANSFER_SAME_ACCOUNT. */
+    public static final String ACCOUNT_TRANSFER_SAME_ACCOUNT =
+            "EXP-ACCOUNT-002 | La cuenta de origen y destino deben ser distintas";
+
+    /** The Constant ACCOUNT_TRANSFER_INVALID_AMOUNT. */
+    public static final String ACCOUNT_TRANSFER_INVALID_AMOUNT =
+            "EXP-ACCOUNT-003 | El importe de la transferencia debe ser mayor que cero";
+
+    /** The Constant ACCOUNT_TRANSFER_CATEGORY_MISSING. */
+    public static final String ACCOUNT_TRANSFER_CATEGORY_MISSING =
+            "EXP-ACCOUNT-004 | No se encontró categoría de transferencia en la cuenta";
 
     /** The Constant AUTH_EMAIL_ALREADY_EXISTS. */
     public static final String AUTH_EMAIL_ALREADY_EXISTS = "EXP-AUTH-001 | Ya existe un usuario con ese email";

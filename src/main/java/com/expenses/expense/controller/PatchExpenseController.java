@@ -26,9 +26,12 @@ public class PatchExpenseController implements PatchExpenseV1Api {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<ExpenseV1ResponseDto> patchExpenseV1(final Integer id, final PatchExpenseV1RequestDto patchExpenseV1RequestDto) {
+    public ResponseEntity<ExpenseV1ResponseDto> patchExpenseV1(
+            final Integer accountId,
+            final Integer id,
+            final PatchExpenseV1RequestDto patchExpenseV1RequestDto) {
 
-        final var expenseEntity = this.expenseRepository.update(id, patchExpenseV1RequestDto);
+        final var expenseEntity = this.expenseRepository.update(accountId, id, patchExpenseV1RequestDto);
         final var expenseV1ResponseDto = this.expenseResponseMapper.toExpenseV1Response(expenseEntity);
         return ResponseEntity.ok(expenseV1ResponseDto);
     }

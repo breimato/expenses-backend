@@ -73,13 +73,52 @@ function Ensure-Postgres {
     }
 }
 
-function Ensure-Backend {
-    if (Test-PortOpen 8080) {
-        Write-StackLog 'Backend ya escucha en :8080'
-        return
-    }
+function Test-JarStale {
     if (-not (Test-Path $jarPath)) {
-        Write-StackLog "Compilando JAR (no existe $jarPath)..."
+        return $true
+    }
+    $jarTime = (Get-Item $jarPath).LastWriteTimeUtc
+    $sourceMarkers = @(
+        (Join-Path $backendRoot 'pom.xml'),
+        (Join-Path $backendRoot 'src\main\java'),
+        (Join-Path $backendRoot 'src\main\resources')
+    )
+    foreach ($marker in $sourceMarkers) {
+        if (-not (Test-Path $marker)) {
+            continue
+        }
+        $latest = Get-ChildItem -Path $marker -Recurse -File -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+        if ($latest -and $latest.LastWriteTimeUtc -gt $jarTime) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Stop-Backend {
+    Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue |
+        ForEach-Object {
+            Write-StackLog "Deteniendo backend PID $($_.OwningProcess)"
+            Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue
+        }
+    Start-Sleep -Seconds 2
+}
+
+function Ensure-Backend {
+    $jarStale = Test-JarStale
+    if (Test-PortOpen 8080) {
+        if ($jarStale) {
+            Write-StackLog 'Backend en marcha con JAR desactualizado; reconstruyendo...'
+            Stop-Backend
+        } else {
+            Write-StackLog 'Backend ya escucha en :8080'
+            return
+        }
+    }
+    if (-not (Test-Path $jarPath) -or $jarStale) {
+        Write-StackLog 'Compilando JAR del backend...'
         Push-Location $backendRoot
         try {
             mvn -DskipTests package

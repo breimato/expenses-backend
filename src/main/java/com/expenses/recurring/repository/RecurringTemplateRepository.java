@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.account.service.AccountAccessService;
 import com.expenses.api.dto.PatchRecurringTemplateV1RequestDto;
 import com.expenses.api.dto.PostRecurringTemplateV1RequestDto;
 import com.expenses.auth.service.CurrentUserService;
@@ -46,34 +47,45 @@ public class RecurringTemplateRepository {
     /** The current user service. */
     private final CurrentUserService currentUserService;
 
+    /** The account access service. */
+    private final AccountAccessService accountAccessService;
+
     /**
      * Find all.
      *
+     * @param accountId the account id
      * @param categoryId the category id
      * @return the list
      */
     @Transactional(readOnly = true)
-    public List<RecurringTemplateEntity> findAll(final Integer categoryId) {
+    public List<RecurringTemplateEntity> findAll(final Integer accountId, final Integer categoryId) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         return this.recurringTemplateJpaMapper.findByCriteria(
                 this.currentUserService.getRequiredUserId(),
+                accountId,
                 categoryId);
     }
 
     /**
      * Create.
      *
+     * @param accountId the account id
      * @param postRecurringTemplateV1RequestDto the post recurring template v1 request dto
      * @return the recurring template entity
      */
     @Transactional
-    public RecurringTemplateEntity create(final PostRecurringTemplateV1RequestDto postRecurringTemplateV1RequestDto) {
+    public RecurringTemplateEntity create(
+            final Integer accountId,
+            final PostRecurringTemplateV1RequestDto postRecurringTemplateV1RequestDto) {
 
         final var userId = this.currentUserService.getRequiredUserId();
-        this.ensureCategoryExists(postRecurringTemplateV1RequestDto.getCategoryId(), userId);
+        this.accountAccessService.requireAccountAccess(accountId);
+        this.ensureCategoryExists(accountId, postRecurringTemplateV1RequestDto.getCategoryId(), userId);
         final var recurringTemplateEntity =
                 this.postRecurringTemplateRequestMapper.toRecurringTemplateEntity(postRecurringTemplateV1RequestDto);
         recurringTemplateEntity.setUserId(userId);
+        recurringTemplateEntity.setAccountId(accountId);
         this.applyDefaults(recurringTemplateEntity, postRecurringTemplateV1RequestDto);
         return this.recurringTemplateJpaMapper.save(recurringTemplateEntity);
     }
@@ -81,16 +93,23 @@ public class RecurringTemplateRepository {
     /**
      * Update.
      *
+     * @param accountId the account id
      * @param id the id
      * @param patchRecurringTemplateV1RequestDto the patch recurring template v1 request dto
      * @return the recurring template entity
      */
     @Transactional
-    public RecurringTemplateEntity update(final Integer id, final PatchRecurringTemplateV1RequestDto patchRecurringTemplateV1RequestDto) {
+    public RecurringTemplateEntity update(
+            final Integer accountId,
+            final Integer id,
+            final PatchRecurringTemplateV1RequestDto patchRecurringTemplateV1RequestDto) {
 
-        final var recurringTemplateEntity = this.findById(id);
+        final var recurringTemplateEntity = this.findById(accountId, id);
         if (Objects.nonNull(patchRecurringTemplateV1RequestDto.getCategoryId())) {
-            this.ensureCategoryExists(patchRecurringTemplateV1RequestDto.getCategoryId(), recurringTemplateEntity.getUserId());
+            this.ensureCategoryExists(
+                    accountId,
+                    patchRecurringTemplateV1RequestDto.getCategoryId(),
+                    recurringTemplateEntity.getUserId());
         }
         this.patchRecurringTemplateRequestMapper.updateRecurringTemplateEntity(
                 patchRecurringTemplateV1RequestDto,
@@ -109,26 +128,29 @@ public class RecurringTemplateRepository {
     /**
      * Delete.
      *
+     * @param accountId the account id
      * @param id the id
      */
     @Transactional
-    public void delete(final Integer id) {
+    public void delete(final Integer accountId, final Integer id) {
 
-        final var recurringTemplateEntity = this.findById(id);
+        final var recurringTemplateEntity = this.findById(accountId, id);
         this.recurringTemplateJpaMapper.delete(recurringTemplateEntity);
     }
 
     /**
-     * Find by id for current user.
+     * Find by id for current user and account.
      *
+     * @param accountId the account id
      * @param id the id
      * @return the recurring template entity
      */
     @Transactional(readOnly = true)
-    public RecurringTemplateEntity findById(final Integer id) {
+    public RecurringTemplateEntity findById(final Integer accountId, final Integer id) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         return this.recurringTemplateJpaMapper
-                .findByIdAndUserId(id, this.currentUserService.getRequiredUserId())
+                .findByIdAndUserIdAndAccountId(id, this.currentUserService.getRequiredUserId(), accountId)
                 .orElseThrow(() -> new RecurringTemplateException(ExceptionMessageConstants.RECURRING_TEMPLATE_NOT_FOUND));
     }
 
@@ -172,9 +194,9 @@ public class RecurringTemplateRepository {
         }
     }
 
-    private void ensureCategoryExists(final Integer categoryId, final Integer userId) {
+    private void ensureCategoryExists(final Integer accountId, final Integer categoryId, final Integer userId) {
 
-        if (!this.categoryRepository.existsByIdForUser(categoryId, userId)) {
+        if (!this.categoryRepository.existsByIdForUser(accountId, categoryId, userId)) {
             throw new CategoryException(ExceptionMessageConstants.CATEGORY_NOT_FOUND);
         }
     }

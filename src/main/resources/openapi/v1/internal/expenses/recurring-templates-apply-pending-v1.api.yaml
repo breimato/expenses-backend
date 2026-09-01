@@ -4,6 +4,8 @@ post:
   operationId: "PostRecurringTemplatesApplyPendingV1"
   tags:
     - recurring-applications-v1
+  parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
   responses:
     '200':
       description: "200 OK"

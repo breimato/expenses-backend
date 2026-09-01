@@ -29,6 +29,8 @@ import com.expenses.expense.repository.CategorySpendAggregate;
 @ExtendWith(MockitoExtension.class)
 class AnalyticsServiceTest {
 
+    private static final Integer ACCOUNT_ID = 1;
+
     @Mock
     AnalyticsRepository analyticsRepository;
 
@@ -45,18 +47,18 @@ class AnalyticsServiceTest {
         final var firstMovementDate = LocalDate.of(2026, 8, 14);
         final var netSpending = new BigDecimal("10.00");
         when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 8, 10));
-        when(this.analyticsRepository.findFirstMovementDateInRange(monthStart, referenceDate))
+        when(this.analyticsRepository.findFirstMovementDateInRange(ACCOUNT_ID, monthStart, referenceDate))
                 .thenReturn(Optional.of(firstMovementDate));
-        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
-        when(this.analyticsRepository.sumNetBalanceAsOf(referenceDate)).thenReturn(new BigDecimal("100.00"));
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, monthStart, referenceDate)).thenReturn(netSpending);
+        when(this.analyticsRepository.sumNetBalanceAsOf(ACCOUNT_ID, referenceDate)).thenReturn(new BigDecimal("100.00"));
 
         // When
-        final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
+        final var analyticsAveragesResult = this.analyticsService.computeAverages(ACCOUNT_ID, referenceDate);
 
         // Then
         verify(this.analyticsRepository, times(1)).getCurrentUserCreatedOn();
-        verify(this.analyticsRepository, times(1)).findFirstMovementDateInRange(monthStart, referenceDate);
-        verify(this.analyticsRepository, times(1)).sumNetBalanceAsOf(referenceDate);
+        verify(this.analyticsRepository, times(1)).findFirstMovementDateInRange(ACCOUNT_ID, monthStart, referenceDate);
+        verify(this.analyticsRepository, times(1)).sumNetBalanceAsOf(ACCOUNT_ID, referenceDate);
         assertEquals(new BigDecimal("10.00"), analyticsAveragesResult.dailyAverage());
         assertEquals(new BigDecimal("100.00"), analyticsAveragesResult.balanceAsOf());
     }
@@ -70,11 +72,11 @@ class AnalyticsServiceTest {
         final var monthStart = LocalDate.of(2026, 9, 1);
         final var netSpending = new BigDecimal("140.00");
         when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 8, 10));
-        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
-        when(this.analyticsRepository.sumNetBalanceAsOf(referenceDate)).thenReturn(new BigDecimal("250.00"));
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, monthStart, referenceDate)).thenReturn(netSpending);
+        when(this.analyticsRepository.sumNetBalanceAsOf(ACCOUNT_ID, referenceDate)).thenReturn(new BigDecimal("250.00"));
 
         // When
-        final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
+        final var analyticsAveragesResult = this.analyticsService.computeAverages(ACCOUNT_ID, referenceDate);
 
         // Then
         assertEquals(new BigDecimal("10.00"), analyticsAveragesResult.dailyAverage());
@@ -91,13 +93,13 @@ class AnalyticsServiceTest {
         final var firstMovementInMonth = LocalDate.of(2026, 8, 10);
         final var netSpending = new BigDecimal("50.00");
         when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 8, 1));
-        when(this.analyticsRepository.findFirstMovementDateInRange(monthStart, referenceDate))
+        when(this.analyticsRepository.findFirstMovementDateInRange(ACCOUNT_ID, monthStart, referenceDate))
                 .thenReturn(Optional.of(firstMovementInMonth));
-        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(netSpending);
-        when(this.analyticsRepository.sumNetBalanceAsOf(referenceDate)).thenReturn(new BigDecimal("80.00"));
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, monthStart, referenceDate)).thenReturn(netSpending);
+        when(this.analyticsRepository.sumNetBalanceAsOf(ACCOUNT_ID, referenceDate)).thenReturn(new BigDecimal("80.00"));
 
         // When
-        final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
+        final var analyticsAveragesResult = this.analyticsService.computeAverages(ACCOUNT_ID, referenceDate);
 
         // Then
         assertEquals(new BigDecimal("10.00"), analyticsAveragesResult.dailyAverage());
@@ -112,11 +114,11 @@ class AnalyticsServiceTest {
         final var referenceDate = LocalDate.of(2026, 8, 14);
         final var monthStart = LocalDate.of(2026, 8, 1);
         when(this.analyticsRepository.getCurrentUserCreatedOn()).thenReturn(LocalDate.of(2026, 7, 1));
-        when(this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate)).thenReturn(BigDecimal.ZERO);
-        when(this.analyticsRepository.sumNetBalanceAsOf(referenceDate)).thenReturn(BigDecimal.ZERO);
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, monthStart, referenceDate)).thenReturn(BigDecimal.ZERO);
+        when(this.analyticsRepository.sumNetBalanceAsOf(ACCOUNT_ID, referenceDate)).thenReturn(BigDecimal.ZERO);
 
         // When
-        final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
+        final var analyticsAveragesResult = this.analyticsService.computeAverages(ACCOUNT_ID, referenceDate);
 
         // Then
         assertEquals(new BigDecimal("0.00"), analyticsAveragesResult.dailyAverage());
@@ -144,13 +146,14 @@ class AnalyticsServiceTest {
         categoryEntityTwo.setId(2);
         categoryEntityTwo.setName("Ocio");
         categoryEntityTwo.setColor("#8B5CF6");
-        when(this.analyticsRepository.sumExpenseByCategory(monthStart, referenceDate))
+        when(this.analyticsRepository.sumExpenseByCategory(ACCOUNT_ID, monthStart, referenceDate))
                 .thenReturn(List.of(categorySpendAggregateOne, categorySpendAggregateTwo));
-        when(this.analyticsRepository.findCategoriesForCurrentUser())
+        when(this.analyticsRepository.findCategoriesForAccount(ACCOUNT_ID))
                 .thenReturn(List.of(categoryEntityOne, categoryEntityTwo));
 
         // When
-        final var analyticsCategoryBreakdownResult = this.analyticsService.computeCategoryBreakdown(referenceDate);
+        final var analyticsCategoryBreakdownResult =
+                this.analyticsService.computeCategoryBreakdown(ACCOUNT_ID, referenceDate);
 
         // Then
         assertEquals(new BigDecimal("100.00"), analyticsCategoryBreakdownResult.totalSpent());
@@ -167,11 +170,12 @@ class AnalyticsServiceTest {
         // Given
         final var dateFrom = LocalDate.of(2026, 8, 1);
         final var dateTo = LocalDate.of(2026, 8, 10);
-        when(this.analyticsRepository.sumNetSpendingByDateRange(dateFrom, dateTo))
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, dateFrom, dateTo))
                 .thenReturn(new BigDecimal("100.00"));
 
         // When
-        final var analyticsPeriodAverageResult = this.analyticsService.computePeriodAverage(dateFrom, dateTo);
+        final var analyticsPeriodAverageResult =
+                this.analyticsService.computePeriodAverage(ACCOUNT_ID, dateFrom, dateTo);
 
         // Then
         assertEquals(new BigDecimal("10.00"), analyticsPeriodAverageResult.dailyAverage());
@@ -188,11 +192,12 @@ class AnalyticsServiceTest {
         // Given
         final var dateFrom = LocalDate.of(2026, 8, 15);
         final var dateTo = LocalDate.of(2026, 8, 15);
-        when(this.analyticsRepository.sumNetSpendingByDateRange(dateFrom, dateTo))
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, dateFrom, dateTo))
                 .thenReturn(new BigDecimal("42.50"));
 
         // When
-        final var analyticsPeriodAverageResult = this.analyticsService.computePeriodAverage(dateFrom, dateTo);
+        final var analyticsPeriodAverageResult =
+                this.analyticsService.computePeriodAverage(ACCOUNT_ID, dateFrom, dateTo);
 
         // Then
         assertEquals(new BigDecimal("42.50"), analyticsPeriodAverageResult.dailyAverage());
@@ -210,7 +215,7 @@ class AnalyticsServiceTest {
         // When / Then
         final var expenseException = assertThrows(
                 ExpenseException.class,
-                () -> this.analyticsService.computePeriodAverage(dateFrom, dateTo));
+                () -> this.analyticsService.computePeriodAverage(ACCOUNT_ID, dateFrom, dateTo));
         assertEquals(ExceptionMessageConstants.ANALYTICS_INVALID_DATE_RANGE, expenseException.getMessage());
         assertEquals(HttpStatus.BAD_REQUEST, expenseException.getHttpStatus());
     }

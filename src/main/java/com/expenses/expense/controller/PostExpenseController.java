@@ -27,9 +27,11 @@ public class PostExpenseController implements PostExpenseV1Api {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<ExpenseV1ResponseDto> postExpenseV1(final PostExpenseV1RequestDto postExpenseV1RequestDto) {
+    public ResponseEntity<ExpenseV1ResponseDto> postExpenseV1(
+            final Integer accountId,
+            final PostExpenseV1RequestDto postExpenseV1RequestDto) {
 
-        final var expenseEntity = this.expenseRepository.create(postExpenseV1RequestDto);
+        final var expenseEntity = this.expenseRepository.create(accountId, postExpenseV1RequestDto);
         final var expenseV1ResponseDto = this.expenseResponseMapper.toExpenseV1Response(expenseEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(expenseV1ResponseDto);
     }

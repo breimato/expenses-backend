@@ -5,6 +5,7 @@ get:
   tags:
     - get-expenses-v1
   parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
     - name: categoryId
       in: query
       required: false
@@ -46,6 +47,8 @@ post:
   operationId: "PostExpenseV1"
   tags:
     - post-expense-v1
+  parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
   requestBody:
     required: true
     content:

@@ -32,9 +32,13 @@ paths:
     $ref: './expenses/recurring-templates-id-quick-add-v1.api.yaml'
   /v1/expenses/recurring-applications:
     $ref: './expenses/recurring-templates-apply-pending-v1.api.yaml'
-  # Profile
-  /v1/expenses/profile:
-    $ref: './expenses/profile-v1.api.yaml'
+  # Accounts
+  /v1/expenses/accounts:
+    $ref: './expenses/accounts-v1.api.yaml'
+  /v1/expenses/accounts/{id}:
+    $ref: './expenses/accounts-id-v1.api.yaml'
+  /v1/expenses/account-transfers:
+    $ref: './expenses/account-transfers-v1.api.yaml'
   # Analytics
   /v1/expenses/analytics/averages:
     $ref: './expenses/analytics-averages-v1.api.yaml'
@@ -70,6 +74,10 @@ components:
       $ref: './components/RecurringTemplateV1.yaml'
     ProfileV1:
       $ref: './components/ProfileV1.yaml'
+    AccountV1:
+      $ref: './components/AccountV1.yaml'
+    AccountTransferV1:
+      $ref: './components/AccountTransferV1.yaml'
     AnalyticsAveragesV1:
       $ref: './components/AnalyticsAveragesV1.yaml'
     AnalyticsProjectionsV1:
@@ -94,6 +102,12 @@ components:
       $ref: './requests/PostRecurringTemplateQuickAddV1Request.yaml'
     PatchProfileV1Request:
       $ref: './requests/PatchProfileV1Request.yaml'
+    PostAccountV1Request:
+      $ref: './requests/PostAccountV1Request.yaml'
+    PatchAccountV1Request:
+      $ref: './requests/PatchAccountV1Request.yaml'
+    PostAccountTransferV1Request:
+      $ref: './requests/PostAccountTransferV1Request.yaml'
     GetAnalyticsAveragesV1Request:
       $ref: './requests/GetAnalyticsAveragesV1Request.yaml'
     GetAnalyticsProjectionsV1Request:
@@ -114,6 +128,12 @@ components:
       $ref: './responses/GetRecurringTemplatesV1Response.yaml'
     ProfileV1Response:
       $ref: './responses/ProfileV1Response.yaml'
+    AccountV1Response:
+      $ref: './responses/AccountV1Response.yaml'
+    GetAccountsV1Response:
+      $ref: './responses/GetAccountsV1Response.yaml'
+    AccountTransferV1Response:
+      $ref: './responses/AccountTransferV1Response.yaml'
     GetAnalyticsAveragesV1Response:
       $ref: './responses/GetAnalyticsAveragesV1Response.yaml'
     GetAnalyticsProjectionsV1Response:

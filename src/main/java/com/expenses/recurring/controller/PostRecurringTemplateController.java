@@ -28,9 +28,11 @@ public class PostRecurringTemplateController implements PostRecurringTemplateV1A
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<RecurringTemplateV1ResponseDto> postRecurringTemplateV1(
+            final Integer accountId,
             final PostRecurringTemplateV1RequestDto postRecurringTemplateV1RequestDto) {
 
-        final var recurringTemplateEntity = this.recurringTemplateRepository.create(postRecurringTemplateV1RequestDto);
+        final var recurringTemplateEntity =
+                this.recurringTemplateRepository.create(accountId, postRecurringTemplateV1RequestDto);
         final var recurringTemplateV1ResponseDto =
                 this.recurringTemplateResponseMapper.toRecurringTemplateV1Response(recurringTemplateEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(recurringTemplateV1ResponseDto);

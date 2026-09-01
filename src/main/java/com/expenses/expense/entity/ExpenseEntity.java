@@ -36,6 +36,10 @@ public class ExpenseEntity {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
+    /** The account id. */
+    @Column(name = "account_id", nullable = false)
+    private Integer accountId;
+
     /** The category id. */
     @Column(name = "category_id", nullable = false)
     private Integer categoryId;
@@ -54,7 +58,7 @@ public class ExpenseEntity {
 
     /** The movement type. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "movement_type", nullable = false, length = 10)
+    @Column(name = "movement_type", nullable = false, length = 20)
     private MovementType movementType = MovementType.EXPENSE;
 
     /**
@@ -69,6 +73,10 @@ public class ExpenseEntity {
      */
     @Column(name = "reimbursed_expense_id")
     private Integer reimbursedExpenseId;
+
+    /** The transfer id. */
+    @Column(name = "transfer_id")
+    private Integer transferId;
 
     /** The created at. */
     @Column(name = "created_at", nullable = false)

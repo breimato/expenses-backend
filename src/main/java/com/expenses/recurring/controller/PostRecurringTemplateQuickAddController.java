@@ -26,10 +26,12 @@ public class PostRecurringTemplateQuickAddController implements RecurringTemplat
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<ExpenseV1ResponseDto> postRecurringTemplateQuickAddV1(
+            final Integer accountId,
             final Integer id,
             final PostRecurringTemplateQuickAddV1RequestDto postRecurringTemplateQuickAddV1RequestDto) {
 
-        final var expenseEntity = this.recurringTemplateService.quickAdd(id, postRecurringTemplateQuickAddV1RequestDto);
+        final var expenseEntity =
+                this.recurringTemplateService.quickAdd(accountId, id, postRecurringTemplateQuickAddV1RequestDto);
         final var expenseV1ResponseDto = this.expenseResponseMapper.toExpenseV1Response(expenseEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(expenseV1ResponseDto);
     }

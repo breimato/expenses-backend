@@ -27,12 +27,14 @@ public class GetExpensesController implements GetExpensesV1Api {
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<GetExpensesV1ResponseDto> getExpensesV1(
+            final Integer accountId,
             final Integer categoryId,
             final LocalDate expenseDate,
             final String description,
             final MovementTypeV1 movementType) {
 
         final var expenseEntityList = this.expenseRepository.findAll(
+                accountId,
                 categoryId,
                 expenseDate,
                 description,

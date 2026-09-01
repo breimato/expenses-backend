@@ -5,6 +5,7 @@ get:
   tags:
     - get-categories-v1
   parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
     - name: id
       in: query
       required: false
@@ -40,6 +41,8 @@ post:
   operationId: "PostCategoryV1"
   tags:
     - post-category-v1
+  parameters:
+    - $ref: '../parameters/AccountIdV1.yaml'
   requestBody:
     required: true
     content:

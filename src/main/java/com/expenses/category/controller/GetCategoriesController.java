@@ -25,12 +25,13 @@ public class GetCategoriesController implements GetCategoriesV1Api {
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<GetCategoriesV1ResponseDto> getCategoriesV1(
-            final Integer id, final String name, final MovementTypeV1 movementType) {
+            final Integer accountId,
+            final Integer id,
+            final String name,
+            final MovementTypeV1 movementType) {
 
-        final var categoryEntityList = this.categoryRepository.findAll(id, name, movementType);
-
+        final var categoryEntityList = this.categoryRepository.findAll(accountId, id, name, movementType);
         final var getCategoriesV1ResponseDto = this.categoryResponseMapper.toGetCategoriesV1Response(categoryEntityList);
-
         return ResponseEntity.ok(getCategoriesV1ResponseDto);
     }
 }

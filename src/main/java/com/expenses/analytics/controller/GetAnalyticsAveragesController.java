@@ -32,7 +32,9 @@ public class GetAnalyticsAveragesController implements GetAnalyticsAveragesV1Api
         final var referenceDate = getAnalyticsAveragesV1RequestDto.getReferenceDate() != null
                 ? getAnalyticsAveragesV1RequestDto.getReferenceDate()
                 : LocalDate.now();
-        final var analyticsAveragesResult = this.analyticsService.computeAverages(referenceDate);
+        final var analyticsAveragesResult = this.analyticsService.computeAverages(
+                getAnalyticsAveragesV1RequestDto.getAccountId(),
+                referenceDate);
 
         final var getAnalyticsAveragesV1ResponseDto =
                 this.analyticsResponseMapper.toGetAnalyticsAveragesV1Response(analyticsAveragesResult);

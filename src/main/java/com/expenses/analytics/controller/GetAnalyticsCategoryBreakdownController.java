@@ -33,7 +33,9 @@ public class GetAnalyticsCategoryBreakdownController implements GetAnalyticsCate
         final var referenceDate = Objects.nonNull(getAnalyticsAveragesV1RequestDto.getReferenceDate())
                 ? getAnalyticsAveragesV1RequestDto.getReferenceDate()
                 : LocalDate.now();
-        final var analyticsCategoryBreakdownResult = this.analyticsService.computeCategoryBreakdown(referenceDate);
+        final var analyticsCategoryBreakdownResult = this.analyticsService.computeCategoryBreakdown(
+                getAnalyticsAveragesV1RequestDto.getAccountId(),
+                referenceDate);
         final var getAnalyticsCategoryBreakdownV1ResponseDto =
                 this.analyticsResponseMapper.toGetAnalyticsCategoryBreakdownV1Response(analyticsCategoryBreakdownResult);
         return ResponseEntity.ok(getAnalyticsCategoryBreakdownV1ResponseDto);

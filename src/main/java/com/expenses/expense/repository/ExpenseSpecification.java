@@ -29,6 +29,7 @@ public final class ExpenseSpecification {
      */
     public static Specification<ExpenseEntity> withFilters(
             final Integer userId,
+            final Integer accountId,
             final Integer categoryId,
             final LocalDate expenseDate,
             final String description,
@@ -37,6 +38,7 @@ public final class ExpenseSpecification {
         return (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
+            predicates.add(criteriaBuilder.equal(root.get("accountId"), accountId));
             if (categoryId != null) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryId"), categoryId));
             }

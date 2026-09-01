@@ -19,9 +19,9 @@ public class DeleteExpenseController implements DeleteExpenseV1Api {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<Void> deleteExpenseV1(final Integer id) {
+    public ResponseEntity<Void> deleteExpenseV1(final Integer accountId, final Integer id) {
 
-        this.expenseRepository.delete(id);
+        this.expenseRepository.delete(accountId, id);
         return ResponseEntity.noContent().build();
     }
 }

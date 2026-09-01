@@ -56,11 +56,11 @@ public class AnalyticsService {
      * @return the analytics averages result
      */
     @Transactional(readOnly = true)
-    public AnalyticsAveragesResult computeAverages(final LocalDate referenceDate) {
+    public AnalyticsAveragesResult computeAverages(final Integer accountId, final LocalDate referenceDate) {
 
-        final var monthSpendingPace = this.resolveMonthSpendingPace(referenceDate);
+        final var monthSpendingPace = this.resolveMonthSpendingPace(accountId, referenceDate);
         final var balanceAsOf = Objects.requireNonNullElse(
-                this.analyticsRepository.sumNetBalanceAsOf(referenceDate),
+                this.analyticsRepository.sumNetBalanceAsOf(accountId, referenceDate),
                 BigDecimal.ZERO);
         return AnalyticsAveragesResult.builder()
                 .dailyAverage(this.divide(monthSpendingPace.netSpending(), monthSpendingPace.daysElapsed()))
@@ -76,13 +76,16 @@ public class AnalyticsService {
      * @return the analytics period average result
      */
     @Transactional(readOnly = true)
-    public AnalyticsPeriodAverageResult computePeriodAverage(final LocalDate dateFrom, final LocalDate dateTo) {
+    public AnalyticsPeriodAverageResult computePeriodAverage(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo) {
 
         if (Objects.isNull(dateFrom) || Objects.isNull(dateTo) || dateFrom.isAfter(dateTo)) {
             throw new ExpenseException(ExceptionMessageConstants.ANALYTICS_INVALID_DATE_RANGE, HttpStatus.BAD_REQUEST);
         }
         final var totalNetSpending = Objects.requireNonNullElse(
-                this.analyticsRepository.sumNetSpendingByDateRange(dateFrom, dateTo),
+                this.analyticsRepository.sumNetSpendingByDateRange(accountId, dateFrom, dateTo),
                 BigDecimal.ZERO);
         final var daysInPeriod = this.countInclusiveDays(dateFrom, dateTo);
         return AnalyticsPeriodAverageResult.builder()
@@ -101,9 +104,9 @@ public class AnalyticsService {
      * @return the analytics projections result
      */
     @Transactional(readOnly = true)
-    public AnalyticsProjectionsResult computeProjections(final LocalDate referenceDate) {
+    public AnalyticsProjectionsResult computeProjections(final Integer accountId, final LocalDate referenceDate) {
 
-        final var monthSpendingPace = this.resolveMonthSpendingPace(referenceDate);
+        final var monthSpendingPace = this.resolveMonthSpendingPace(accountId, referenceDate);
 
         final var dailyAverage = this.divideUnscaled(monthSpendingPace.netSpending(), monthSpendingPace.daysElapsed());
 
@@ -111,7 +114,7 @@ public class AnalyticsService {
                 .multiply(BigDecimal.valueOf(Math.max(monthSpendingPace.activeDaysInMonth(), 0)))
                 .setScale(MONEY_SCALE, RoundingMode.HALF_UP);
 
-        final var projectedEndOfMonthBalance = this.getProjectedEndOfMonthBalance(dailyAverage, monthSpendingPace);
+        final var projectedEndOfMonthBalance = this.getProjectedEndOfMonthBalance(accountId, dailyAverage, monthSpendingPace);
 
         return AnalyticsProjectionsResult.builder()
                 .projectedMonthlyExpense(projectedMonthlyExpense)
@@ -128,15 +131,17 @@ public class AnalyticsService {
      * @return the projected end of month balance
      */
     private BigDecimal getProjectedEndOfMonthBalance(
-            final BigDecimal dailyAverage, final MonthSpendingPace monthSpendingPace) {
+            final Integer accountId,
+            final BigDecimal dailyAverage,
+            final MonthSpendingPace monthSpendingPace) {
 
         final var projectedRemainingSpend = dailyAverage
                 .multiply(BigDecimal.valueOf(monthSpendingPace.daysRemainingInMonth()))
                 .setScale(MONEY_SCALE, RoundingMode.HALF_UP);
 
-        final var profileBalance = this.analyticsRepository.getProfileBalance();
+        final var accountBalance = this.analyticsRepository.getAccountBalance(accountId);
 
-        return Objects.requireNonNullElse(profileBalance, BigDecimal.ZERO)
+        return Objects.requireNonNullElse(accountBalance, BigDecimal.ZERO)
                 .subtract(projectedRemainingSpend)
                 .setScale(MONEY_SCALE, RoundingMode.HALF_UP);
     }
@@ -148,12 +153,17 @@ public class AnalyticsService {
      * @return the category breakdown result
      */
     @Transactional(readOnly = true)
-    public AnalyticsCategoryBreakdownResult computeCategoryBreakdown(final LocalDate referenceDate) {
+    public AnalyticsCategoryBreakdownResult computeCategoryBreakdown(
+            final Integer accountId,
+            final LocalDate referenceDate) {
 
         final var monthStart = referenceDate.withDayOfMonth(1);
-        final var categorySpendAggregates = this.analyticsRepository.sumExpenseByCategory(monthStart, referenceDate);
+        final var categorySpendAggregates = this.analyticsRepository.sumExpenseByCategory(
+                accountId,
+                monthStart,
+                referenceDate);
 
-        final var categoryEntityById = this.analyticsRepository.findCategoriesForCurrentUser().stream()
+        final var categoryEntityById = this.analyticsRepository.findCategoriesForAccount(accountId).stream()
                 .collect(Collectors.toMap(CategoryEntity::getId, Function.identity()));
 
         final var totalSpent = this.sumCategoryTotals(categorySpendAggregates);
@@ -177,11 +187,11 @@ public class AnalyticsService {
      * @param referenceDate the reference date
      * @return the month spending pace
      */
-    private MonthSpendingPace resolveMonthSpendingPace(final LocalDate referenceDate) {
+    private MonthSpendingPace resolveMonthSpendingPace(final Integer accountId, final LocalDate referenceDate) {
 
         final var monthStart = referenceDate.withDayOfMonth(1);
-        final var periodStart = this.resolvePeriodStart(monthStart, referenceDate);
-        final var netSpending = this.analyticsRepository.sumNetSpendingByDateRange(monthStart, referenceDate);
+        final var periodStart = this.resolvePeriodStart(accountId, monthStart, referenceDate);
+        final var netSpending = this.analyticsRepository.sumNetSpendingByDateRange(accountId, monthStart, referenceDate);
         final var daysElapsed = this.countInclusiveDays(periodStart, referenceDate);
         final var activeDaysInMonth = this.countInclusiveDays(
                 periodStart,
@@ -197,13 +207,16 @@ public class AnalyticsService {
      * @param referenceDate the reference date
      * @return the period start
      */
-    private LocalDate resolvePeriodStart(final LocalDate monthStart, final LocalDate referenceDate) {
+    private LocalDate resolvePeriodStart(
+            final Integer accountId,
+            final LocalDate monthStart,
+            final LocalDate referenceDate) {
 
         final var onboardingMonth = YearMonth.from(this.analyticsRepository.getCurrentUserCreatedOn());
         if (!YearMonth.from(referenceDate).equals(onboardingMonth)) {
             return monthStart;
         }
-        return this.analyticsRepository.findFirstMovementDateInRange(monthStart, referenceDate)
+        return this.analyticsRepository.findFirstMovementDateInRange(accountId, monthStart, referenceDate)
                 .orElse(referenceDate);
     }
 

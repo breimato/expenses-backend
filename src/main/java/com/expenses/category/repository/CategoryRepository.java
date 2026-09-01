@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.account.service.AccountAccessService;
 import com.expenses.api.dto.MovementTypeV1;
 import com.expenses.api.dto.PatchCategoryV1RequestDto;
 import com.expenses.api.dto.PostCategoryV1RequestDto;
@@ -48,19 +49,29 @@ public class CategoryRepository {
     /** The current user service. */
     private final CurrentUserService currentUserService;
 
+    /** The account access service. */
+    private final AccountAccessService accountAccessService;
+
     /**
      * Find all.
      *
+     * @param accountId the account id
      * @param id the id
      * @param name the name
      * @param movementType the movement type
      * @return the list
      */
     @Transactional(readOnly = true)
-    public List<CategoryEntity> findAll(final Integer id, final String name, final MovementTypeV1 movementType) {
+    public List<CategoryEntity> findAll(
+            final Integer accountId,
+            final Integer id,
+            final String name,
+            final MovementTypeV1 movementType) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         return this.categoryJpaMapper.findAll(CategorySpecification.withFilters(
                 this.currentUserService.getRequiredUserId(),
+                accountId,
                 id,
                 name,
                 this.enumMapper.toMovementTypeOrNull(movementType)));
@@ -69,14 +80,17 @@ public class CategoryRepository {
     /**
      * Create.
      *
+     * @param accountId the account id
      * @param postCategoryV1RequestDto the post category v1 request dto
      * @return the category entity
      */
     @Transactional
-    public CategoryEntity create(final PostCategoryV1RequestDto postCategoryV1RequestDto) {
+    public CategoryEntity create(final Integer accountId, final PostCategoryV1RequestDto postCategoryV1RequestDto) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         final var categoryEntity = this.postCategoryRequestMapper.toCategoryEntity(postCategoryV1RequestDto);
         categoryEntity.setUserId(this.currentUserService.getRequiredUserId());
+        categoryEntity.setAccountId(accountId);
         if (Objects.nonNull(postCategoryV1RequestDto.getMovementType())) {
             categoryEntity.setMovementType(this.enumMapper.toMovementType(postCategoryV1RequestDto.getMovementType()));
         }
@@ -86,14 +100,18 @@ public class CategoryRepository {
     /**
      * Update.
      *
+     * @param accountId the account id
      * @param id the id
      * @param patchCategoryV1RequestDto the patch category v1 request dto
      * @return the category entity
      */
     @Transactional
-    public CategoryEntity update(final Integer id, final PatchCategoryV1RequestDto patchCategoryV1RequestDto) {
+    public CategoryEntity update(
+            final Integer accountId,
+            final Integer id,
+            final PatchCategoryV1RequestDto patchCategoryV1RequestDto) {
 
-        final var categoryEntity = this.findById(id);
+        final var categoryEntity = this.findById(accountId, id);
         this.patchCategoryRequestMapper.updateCategoryEntity(patchCategoryV1RequestDto, categoryEntity);
         if (Objects.nonNull(patchCategoryV1RequestDto.getMovementType())) {
             categoryEntity.setMovementType(this.enumMapper.toMovementType(patchCategoryV1RequestDto.getMovementType()));
@@ -104,12 +122,13 @@ public class CategoryRepository {
     /**
      * Delete.
      *
+     * @param accountId the account id
      * @param id the id
      */
     @Transactional
-    public void delete(final Integer id) {
+    public void delete(final Integer accountId, final Integer id) {
 
-        final var categoryEntity = this.findById(id);
+        final var categoryEntity = this.findById(accountId, id);
         if (this.expenseJpaMapper.existsByCategoryId(id) || this.recurringTemplateJpaMapper.existsByCategoryId(id)) {
             throw new CategoryException(ExceptionMessageConstants.CATEGORY_IN_USE, HttpStatus.CONFLICT);
         }
@@ -117,53 +136,59 @@ public class CategoryRepository {
     }
 
     /**
-     * Find by id for current user.
+     * Find by id for current user and account.
      *
+     * @param accountId the account id
      * @param id the id
      * @return the category entity
      */
     @Transactional(readOnly = true)
-    public CategoryEntity findById(final Integer id) {
+    public CategoryEntity findById(final Integer accountId, final Integer id) {
 
-        return this.findByIdForUser(id, this.currentUserService.getRequiredUserId());
+        return this.findByIdForUser(accountId, id, this.currentUserService.getRequiredUserId());
     }
 
     /**
-     * Find by id for user.
+     * Find by id for user and account.
      *
+     * @param accountId the account id
      * @param id the id
      * @param userId the user id
      * @return the category entity
      */
     @Transactional(readOnly = true)
-    public CategoryEntity findByIdForUser(final Integer id, final Integer userId) {
+    public CategoryEntity findByIdForUser(final Integer accountId, final Integer id, final Integer userId) {
 
-        return this.categoryJpaMapper.findByIdAndUserId(id, userId)
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.categoryJpaMapper.findByIdAndUserIdAndAccountId(id, userId, accountId)
                 .orElseThrow(() -> new CategoryException(ExceptionMessageConstants.CATEGORY_NOT_FOUND));
     }
 
     /**
-     * Exists by id for current user.
+     * Exists by id for current user and account.
      *
+     * @param accountId the account id
      * @param id the id
      * @return true, if successful
      */
     @Transactional(readOnly = true)
-    public boolean existsById(final Integer id) {
+    public boolean existsById(final Integer accountId, final Integer id) {
 
-        return this.existsByIdForUser(id, this.currentUserService.getRequiredUserId());
+        return this.existsByIdForUser(accountId, id, this.currentUserService.getRequiredUserId());
     }
 
     /**
-     * Exists by id for user.
+     * Exists by id for user and account.
      *
+     * @param accountId the account id
      * @param id the id
      * @param userId the user id
      * @return true, if successful
      */
     @Transactional(readOnly = true)
-    public boolean existsByIdForUser(final Integer id, final Integer userId) {
+    public boolean existsByIdForUser(final Integer accountId, final Integer id, final Integer userId) {
 
-        return this.categoryJpaMapper.findByIdAndUserId(id, userId).isPresent();
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.categoryJpaMapper.findByIdAndUserIdAndAccountId(id, userId, accountId).isPresent();
     }
 }

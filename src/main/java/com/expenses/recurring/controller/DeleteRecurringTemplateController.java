@@ -19,9 +19,9 @@ public class DeleteRecurringTemplateController implements DeleteRecurringTemplat
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<Void> deleteRecurringTemplateV1(final Integer id) {
+    public ResponseEntity<Void> deleteRecurringTemplateV1(final Integer accountId, final Integer id) {
 
-        this.recurringTemplateRepository.delete(id);
+        this.recurringTemplateRepository.delete(accountId, id);
         return ResponseEntity.noContent().build();
     }
 }

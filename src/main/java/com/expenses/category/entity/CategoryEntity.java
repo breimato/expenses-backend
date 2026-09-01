@@ -34,6 +34,10 @@ public class CategoryEntity {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
+    /** The account id. */
+    @Column(name = "account_id", nullable = false)
+    private Integer accountId;
+
     /** The name. */
     @Column(nullable = false, length = 100)
     private String name;
@@ -48,7 +52,7 @@ public class CategoryEntity {
 
     /** The movement type. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "movement_type", nullable = false, length = 10)
+    @Column(name = "movement_type", nullable = false, length = 20)
     private MovementType movementType = MovementType.EXPENSE;
 
     /** The created at. */

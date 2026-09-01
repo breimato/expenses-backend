@@ -23,6 +23,16 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
     Optional<RecurringTemplateEntity> findByIdAndUserId(Integer id, Integer userId);
 
     /**
+     * Find by id, user id and account id.
+     *
+     * @param id the id
+     * @param userId the user id
+     * @param accountId the account id
+     * @return the optional template
+     */
+    Optional<RecurringTemplateEntity> findByIdAndUserIdAndAccountId(Integer id, Integer userId, Integer accountId);
+
+    /**
      * Find by criteria for user.
      *
      * @param userId the user id
@@ -32,11 +42,13 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
     @Query("""
             SELECT recurringTemplateEntity FROM RecurringTemplateEntity recurringTemplateEntity
             WHERE recurringTemplateEntity.userId = :userId
+              AND recurringTemplateEntity.accountId = :accountId
               AND (:categoryId IS NULL OR recurringTemplateEntity.categoryId = :categoryId)
             ORDER BY recurringTemplateEntity.id ASC
             """)
     List<RecurringTemplateEntity> findByCriteria(
             @Param("userId") Integer userId,
+            @Param("accountId") Integer accountId,
             @Param("categoryId") Integer categoryId);
 
     /**
@@ -70,6 +82,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
     @Query("""
             SELECT recurringTemplateEntity FROM RecurringTemplateEntity recurringTemplateEntity
             WHERE recurringTemplateEntity.userId = :userId
+              AND recurringTemplateEntity.accountId = :accountId
               AND recurringTemplateEntity.enabled = true
               AND recurringTemplateEntity.autoApply = true
               AND recurringTemplateEntity.frequency = :frequency
@@ -79,6 +92,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
             """)
     List<RecurringTemplateEntity> findPendingAutoApplyTemplatesForUser(
             @Param("userId") Integer userId,
+            @Param("accountId") Integer accountId,
             @Param("frequency") RecurringFrequency frequency,
             @Param("dayOfMonth") int dayOfMonth);
 

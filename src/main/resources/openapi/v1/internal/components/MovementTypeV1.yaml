@@ -3,3 +3,5 @@ type: string
 enum:
   - EXPENSE
   - INCOME
+  - TRANSFER_OUT
+  - TRANSFER_IN

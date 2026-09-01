@@ -67,11 +67,12 @@ public class RecurringApplicationService {
      * @return the number of templates applied
      */
     @Transactional
-    public int applyPendingForCurrentUser(final LocalDate referenceDate) {
+    public int applyPendingForCurrentUser(final Integer accountId, final LocalDate referenceDate) {
 
         return this.applyTemplates(
                 this.recurringTemplateJpaMapper.findPendingAutoApplyTemplatesForUser(
                         this.currentUserService.getRequiredUserId(),
+                        accountId,
                         RecurringFrequency.MONTHLY,
                         referenceDate.getDayOfMonth()),
                 referenceDate);
@@ -97,7 +98,10 @@ public class RecurringApplicationService {
                 .movementType(com.expenses.api.dto.MovementTypeV1.valueOf(recurringTemplateEntity.getMovementType().name()))
                 .offsetsSpendingAverage(recurringTemplateEntity.isOffsetsSpendingAverage())
                 .build();
-        return this.expenseRepository.create(postExpenseV1RequestDto, recurringTemplateEntity.getUserId());
+        return this.expenseRepository.create(
+                recurringTemplateEntity.getAccountId(),
+                postExpenseV1RequestDto,
+                recurringTemplateEntity.getUserId());
     }
 
     private int applyTemplates(final List<RecurringTemplateEntity> dueTemplates, final LocalDate referenceDate) {

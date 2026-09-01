@@ -33,7 +33,9 @@ public class GetAnalyticsProjectionsController implements GetAnalyticsProjection
         final var referenceDate = getAnalyticsProjectionsV1RequestDto.getReferenceDate() != null
                 ? getAnalyticsProjectionsV1RequestDto.getReferenceDate()
                 : LocalDate.now();
-        final var analyticsProjectionsResult = this.analyticsService.computeProjections(referenceDate);
+        final var analyticsProjectionsResult = this.analyticsService.computeProjections(
+                getAnalyticsProjectionsV1RequestDto.getAccountId(),
+                referenceDate);
 
         final var getAnalyticsProjectionsV1ResponseDto =
                 this.analyticsResponseMapper.toGetAnalyticsProjectionsV1Response(analyticsProjectionsResult);

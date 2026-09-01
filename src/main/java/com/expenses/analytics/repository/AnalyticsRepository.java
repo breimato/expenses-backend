@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.account.repository.AccountRepository;
+import com.expenses.account.service.AccountAccessService;
 import com.expenses.auth.repository.UserJpaMapper;
 import com.expenses.auth.service.CurrentUserService;
 import com.expenses.category.entity.CategoryEntity;
@@ -17,7 +19,6 @@ import com.expenses.common.exception.AuthException;
 import com.expenses.common.exception.constants.ExceptionMessageConstants;
 import com.expenses.expense.repository.CategorySpendAggregate;
 import com.expenses.expense.repository.ExpenseJpaMapper;
-import com.expenses.profile.repository.ProfileRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +33,8 @@ public class AnalyticsRepository {
     /** The category jpa mapper. */
     private final CategoryJpaMapper categoryJpaMapper;
 
-    /** The profile repository. */
-    private final ProfileRepository profileRepository;
+    /** The account repository. */
+    private final AccountRepository accountRepository;
 
     /** The user jpa mapper. */
     private final UserJpaMapper userJpaMapper;
@@ -41,45 +42,64 @@ public class AnalyticsRepository {
     /** The current user service. */
     private final CurrentUserService currentUserService;
 
+    /** The account access service. */
+    private final AccountAccessService accountAccessService;
+
     /**
      * Sum net spending in the given date range.
      *
+     * @param accountId the account id
      * @param dateFrom the date from
      * @param dateTo the date to
      * @return the sum
      */
     @Transactional(readOnly = true)
-    public BigDecimal sumNetSpendingByDateRange(final LocalDate dateFrom, final LocalDate dateTo) {
+    public BigDecimal sumNetSpendingByDateRange(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         return this.expenseJpaMapper.sumNetSpendingByDateRange(
                 this.currentUserService.getRequiredUserId(),
+                accountId,
                 dateFrom,
                 dateTo);
     }
 
     /**
-     * Find earliest movement date for the current user.
+     * Find earliest movement date for the current user and account.
      *
+     * @param accountId the account id
      * @return the optional first movement date
      */
     @Transactional(readOnly = true)
-    public Optional<LocalDate> findFirstMovementDate() {
+    public Optional<LocalDate> findFirstMovementDate(final Integer accountId) {
 
-        return this.expenseJpaMapper.findMinExpenseDateByUserId(this.currentUserService.getRequiredUserId());
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.expenseJpaMapper.findMinExpenseDateByUserIdAndAccountId(
+                this.currentUserService.getRequiredUserId(),
+                accountId);
     }
 
     /**
-     * Find earliest movement date for the current user within a date range.
+     * Find earliest movement date for the current user and account within a date range.
      *
+     * @param accountId the account id
      * @param dateFrom the date from
      * @param dateTo the date to
      * @return the optional first movement date in range
      */
     @Transactional(readOnly = true)
-    public Optional<LocalDate> findFirstMovementDateInRange(final LocalDate dateFrom, final LocalDate dateTo) {
+    public Optional<LocalDate> findFirstMovementDateInRange(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo) {
 
-        return this.expenseJpaMapper.findMinExpenseDateByUserIdAndExpenseDateBetween(
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.expenseJpaMapper.findMinExpenseDateByUserIdAndAccountIdAndExpenseDateBetween(
                 this.currentUserService.getRequiredUserId(),
+                accountId,
                 dateFrom,
                 dateTo);
     }
@@ -101,52 +121,66 @@ public class AnalyticsRepository {
     }
 
     /**
-     * Sum net balance as of a date for the current user.
+     * Sum net balance as of a date for the current user and account.
      *
+     * @param accountId the account id
      * @param dateTo the inclusive end date
      * @return the balance
      */
     @Transactional(readOnly = true)
-    public BigDecimal sumNetBalanceAsOf(final LocalDate dateTo) {
+    public BigDecimal sumNetBalanceAsOf(final Integer accountId, final LocalDate dateTo) {
 
-        return this.expenseJpaMapper.sumNetBalanceAsOf(this.currentUserService.getRequiredUserId(), dateTo);
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.expenseJpaMapper.sumNetBalanceAsOf(
+                this.currentUserService.getRequiredUserId(),
+                accountId,
+                dateTo);
     }
 
     /**
-     * Sum expenses by category for current user in date range.
+     * Sum expenses by category for current user and account in date range.
      *
+     * @param accountId the account id
      * @param dateFrom the date from
      * @param dateTo the date to
      * @return the aggregates
      */
     @Transactional(readOnly = true)
-    public List<CategorySpendAggregate> sumExpenseByCategory(final LocalDate dateFrom, final LocalDate dateTo) {
+    public List<CategorySpendAggregate> sumExpenseByCategory(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         return this.expenseJpaMapper.sumExpenseByCategory(
                 this.currentUserService.getRequiredUserId(),
+                accountId,
                 dateFrom,
                 dateTo);
     }
 
     /**
-     * Find categories for current user.
+     * Find categories for current user and account.
      *
+     * @param accountId the account id
      * @return the category entities
      */
     @Transactional(readOnly = true)
-    public List<CategoryEntity> findCategoriesForCurrentUser() {
+    public List<CategoryEntity> findCategoriesForAccount(final Integer accountId) {
 
-        return this.categoryJpaMapper.findByUserId(this.currentUserService.getRequiredUserId());
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.categoryJpaMapper.findByAccountId(accountId);
     }
 
     /**
-     * Get current profile balance.
+     * Get account balance.
      *
-     * @return the profile balance
+     * @param accountId the account id
+     * @return the account balance
      */
     @Transactional(readOnly = true)
-    public BigDecimal getProfileBalance() {
+    public BigDecimal getAccountBalance(final Integer accountId) {
 
-        return this.profileRepository.getBalance();
+        return this.accountRepository.getBalance(accountId);
     }
 }

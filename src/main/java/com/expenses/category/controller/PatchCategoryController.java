@@ -26,9 +26,12 @@ public class PatchCategoryController implements PatchCategoryV1Api {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<CategoryV1ResponseDto> patchCategoryV1(final Integer id, final PatchCategoryV1RequestDto patchCategoryV1RequestDto) {
+    public ResponseEntity<CategoryV1ResponseDto> patchCategoryV1(
+            final Integer accountId,
+            final Integer id,
+            final PatchCategoryV1RequestDto patchCategoryV1RequestDto) {
 
-        final var categoryEntity = this.categoryRepository.update(id, patchCategoryV1RequestDto);
+        final var categoryEntity = this.categoryRepository.update(accountId, id, patchCategoryV1RequestDto);
 
         final var categoryV1ResponseDto = this.categoryResponseMapper.toCategoryV1Response(categoryEntity);
 

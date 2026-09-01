@@ -21,9 +21,10 @@ public class PostRecurringTemplatesApplyPendingController implements RecurringAp
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<PostRecurringTemplatesApplyPendingV1Response> postRecurringTemplatesApplyPendingV1() {
+    public ResponseEntity<PostRecurringTemplatesApplyPendingV1Response> postRecurringTemplatesApplyPendingV1(
+            final Integer accountId) {
 
-        final var appliedCount = this.recurringApplicationService.applyPendingForCurrentUser(LocalDate.now());
+        final var appliedCount = this.recurringApplicationService.applyPendingForCurrentUser(accountId, LocalDate.now());
         final var response = PostRecurringTemplatesApplyPendingV1Response.builder()
                 .appliedCount(appliedCount)
                 .build();

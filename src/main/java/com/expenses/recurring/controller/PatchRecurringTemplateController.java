@@ -27,10 +27,12 @@ public class PatchRecurringTemplateController implements PatchRecurringTemplateV
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<RecurringTemplateV1ResponseDto> patchRecurringTemplateV1(
+            final Integer accountId,
             final Integer id,
             final PatchRecurringTemplateV1RequestDto patchRecurringTemplateV1RequestDto) {
 
-        final var recurringTemplateEntity = this.recurringTemplateRepository.update(id, patchRecurringTemplateV1RequestDto);
+        final var recurringTemplateEntity =
+                this.recurringTemplateRepository.update(accountId, id, patchRecurringTemplateV1RequestDto);
         final var recurringTemplateV1ResponseDto =
                 this.recurringTemplateResponseMapper.toRecurringTemplateV1Response(recurringTemplateEntity);
         return ResponseEntity.ok(recurringTemplateV1ResponseDto);

@@ -23,9 +23,11 @@ public class GetRecurringTemplatesController implements GetRecurringTemplatesV1A
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<GetRecurringTemplatesV1ResponseDto> getRecurringTemplatesV1(final Integer categoryId) {
+    public ResponseEntity<GetRecurringTemplatesV1ResponseDto> getRecurringTemplatesV1(
+            final Integer accountId,
+            final Integer categoryId) {
 
-        final var recurringTemplateEntityList = this.recurringTemplateRepository.findAll(categoryId);
+        final var recurringTemplateEntityList = this.recurringTemplateRepository.findAll(accountId, categoryId);
         final var getRecurringTemplatesV1ResponseDto =
                 this.recurringTemplateResponseMapper.toGetRecurringTemplatesV1Response(recurringTemplateEntityList);
         return ResponseEntity.ok(getRecurringTemplatesV1ResponseDto);

@@ -3,7 +3,12 @@ type: object
 required:
   - dateFrom
   - dateTo
+  - accountId
 properties:
+  accountId:
+    type: integer
+    format: int32
+    description: "Account identifier"
   dateFrom:
     type: string
     format: date

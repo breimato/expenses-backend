@@ -19,9 +19,9 @@ public class DeleteCategoryController implements DeleteCategoryV1Api {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<Void> deleteCategoryV1(final Integer id) {
+    public ResponseEntity<Void> deleteCategoryV1(final Integer accountId, final Integer id) {
 
-        this.categoryRepository.delete(id);
+        this.categoryRepository.delete(accountId, id);
         return ResponseEntity.noContent().build();
     }
 }
