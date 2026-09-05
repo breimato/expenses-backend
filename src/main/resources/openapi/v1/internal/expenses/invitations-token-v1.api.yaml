@@ -1,0 +1,62 @@
+get:
+  summary: "Get Account Invitation V1"
+  description: "Preview an invitation by token"
+  operationId: "GetAccountInvitationV1"
+  tags:
+    - get-account-invitation-v1
+  parameters:
+    - name: token
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/AccountInvitationPreviewV1Response.yaml'
+    '404':
+      $ref: '../es-expenses.api.yaml#/components/responses/NotFound'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+post:
+  summary: "Post Account Invitation Accept V1"
+  description: "Accept an invitation by token (registered user)"
+  operationId: "PostAccountInvitationAcceptV1"
+  tags:
+    - post-account-invitation-accept-v1
+  parameters:
+    - name: token
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/AccountV1Response.yaml'
+    '400':
+      $ref: '../es-expenses.api.yaml#/components/responses/BadRequest'
+    '404':
+      $ref: '../es-expenses.api.yaml#/components/responses/NotFound'
+    '409':
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

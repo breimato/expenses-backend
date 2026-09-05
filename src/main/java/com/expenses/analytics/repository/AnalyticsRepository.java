@@ -60,11 +60,7 @@ public class AnalyticsRepository {
             final LocalDate dateTo) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.sumNetSpendingByDateRange(
-                this.currentUserService.getRequiredUserId(),
-                accountId,
-                dateFrom,
-                dateTo);
+        return this.expenseJpaMapper.sumNetSpendingByDateRange(accountId, dateFrom, dateTo);
     }
 
     /**
@@ -77,9 +73,7 @@ public class AnalyticsRepository {
     public Optional<LocalDate> findFirstMovementDate(final Integer accountId) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.findMinExpenseDateByUserIdAndAccountId(
-                this.currentUserService.getRequiredUserId(),
-                accountId);
+        return this.expenseJpaMapper.findMinExpenseDateByAccountId(accountId);
     }
 
     /**
@@ -97,8 +91,7 @@ public class AnalyticsRepository {
             final LocalDate dateTo) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.findMinExpenseDateByUserIdAndAccountIdAndExpenseDateBetween(
-                this.currentUserService.getRequiredUserId(),
+        return this.expenseJpaMapper.findMinExpenseDateByAccountIdAndExpenseDateBetween(
                 accountId,
                 dateFrom,
                 dateTo);
@@ -131,10 +124,7 @@ public class AnalyticsRepository {
     public BigDecimal sumNetBalanceAsOf(final Integer accountId, final LocalDate dateTo) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.sumNetBalanceAsOf(
-                this.currentUserService.getRequiredUserId(),
-                accountId,
-                dateTo);
+        return this.expenseJpaMapper.sumNetBalanceAsOf(accountId, dateTo);
     }
 
     /**
@@ -152,11 +142,7 @@ public class AnalyticsRepository {
             final LocalDate dateTo) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.sumExpenseByCategory(
-                this.currentUserService.getRequiredUserId(),
-                accountId,
-                dateFrom,
-                dateTo);
+        return this.expenseJpaMapper.sumExpenseByCategory(accountId, dateFrom, dateTo);
     }
 
     /**

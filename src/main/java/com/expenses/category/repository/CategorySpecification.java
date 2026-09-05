@@ -2,6 +2,7 @@ package com.expenses.category.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -19,14 +20,13 @@ public final class CategorySpecification {
     /**
      * Build specification for optional category filters.
      *
-     * @param userId the user id
+     * @param accountId the account id
      * @param id the id
      * @param name the name
      * @param movementType the movement type
      * @return the specification
      */
     public static Specification<CategoryEntity> withFilters(
-            final Integer userId,
             final Integer accountId,
             final Integer id,
             final String name,
@@ -34,17 +34,16 @@ public final class CategorySpecification {
 
         return (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
             predicates.add(criteriaBuilder.equal(root.get("accountId"), accountId));
-            if (id != null) {
+            if (Objects.nonNull(id)) {
                 predicates.add(criteriaBuilder.equal(root.get("id"), id));
             }
-            if (name != null && !name.isBlank()) {
+            if (Objects.nonNull(name) && !name.isBlank()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("name")),
                         "%" + name.toLowerCase() + "%"));
             }
-            if (movementType != null) {
+            if (Objects.nonNull(movementType)) {
                 predicates.add(criteriaBuilder.equal(root.get("movementType"), movementType));
             }
             query.orderBy(

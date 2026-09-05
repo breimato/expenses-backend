@@ -70,7 +70,6 @@ public class CategoryRepository {
 
         this.accountAccessService.requireAccountAccess(accountId);
         return this.categoryJpaMapper.findAll(CategorySpecification.withFilters(
-                this.currentUserService.getRequiredUserId(),
                 accountId,
                 id,
                 name,
@@ -136,7 +135,7 @@ public class CategoryRepository {
     }
 
     /**
-     * Find by id for current user and account.
+     * Find by id for account.
      *
      * @param accountId the account id
      * @param id the id
@@ -145,27 +144,13 @@ public class CategoryRepository {
     @Transactional(readOnly = true)
     public CategoryEntity findById(final Integer accountId, final Integer id) {
 
-        return this.findByIdForUser(accountId, id, this.currentUserService.getRequiredUserId());
-    }
-
-    /**
-     * Find by id for user and account.
-     *
-     * @param accountId the account id
-     * @param id the id
-     * @param userId the user id
-     * @return the category entity
-     */
-    @Transactional(readOnly = true)
-    public CategoryEntity findByIdForUser(final Integer accountId, final Integer id, final Integer userId) {
-
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.categoryJpaMapper.findByIdAndUserIdAndAccountId(id, userId, accountId)
+        return this.categoryJpaMapper.findByIdAndAccountId(id, accountId)
                 .orElseThrow(() -> new CategoryException(ExceptionMessageConstants.CATEGORY_NOT_FOUND));
     }
 
     /**
-     * Exists by id for current user and account.
+     * Exists by id for account.
      *
      * @param accountId the account id
      * @param id the id
@@ -174,21 +159,7 @@ public class CategoryRepository {
     @Transactional(readOnly = true)
     public boolean existsById(final Integer accountId, final Integer id) {
 
-        return this.existsByIdForUser(accountId, id, this.currentUserService.getRequiredUserId());
-    }
-
-    /**
-     * Exists by id for user and account.
-     *
-     * @param accountId the account id
-     * @param id the id
-     * @param userId the user id
-     * @return true, if successful
-     */
-    @Transactional(readOnly = true)
-    public boolean existsByIdForUser(final Integer accountId, final Integer id, final Integer userId) {
-
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.categoryJpaMapper.findByIdAndUserIdAndAccountId(id, userId, accountId).isPresent();
+        return this.categoryJpaMapper.findByIdAndAccountId(id, accountId).isPresent();
     }
 }

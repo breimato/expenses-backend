@@ -1,0 +1,5 @@
+description: "Account member role V1"
+type: string
+enum:
+  - OWNER
+  - MEMBER

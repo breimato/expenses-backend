@@ -9,8 +9,8 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.account.service.AccountAccessService;
 import com.expenses.api.dto.PostExpenseV1RequestDto;
-import com.expenses.auth.service.CurrentUserService;
 import com.expenses.common.RecurringFrequency;
 import com.expenses.expense.entity.ExpenseEntity;
 import com.expenses.expense.repository.ExpenseRepository;
@@ -41,8 +41,8 @@ public class RecurringApplicationService {
     /** The recurring template repository. */
     private final RecurringTemplateRepository recurringTemplateRepository;
 
-    /** The current user service. */
-    private final CurrentUserService currentUserService;
+    /** The account access service. */
+    private final AccountAccessService accountAccessService;
 
     /**
      * Apply templates scheduled for this exact day (daily scheduler).
@@ -69,9 +69,9 @@ public class RecurringApplicationService {
     @Transactional
     public int applyPendingForCurrentUser(final Integer accountId, final LocalDate referenceDate) {
 
+        this.accountAccessService.requireAccountAccess(accountId);
         return this.applyTemplates(
-                this.recurringTemplateJpaMapper.findPendingAutoApplyTemplatesForUser(
-                        this.currentUserService.getRequiredUserId(),
+                this.recurringTemplateJpaMapper.findPendingAutoApplyTemplatesForAccount(
                         accountId,
                         RecurringFrequency.MONTHLY,
                         referenceDate.getDayOfMonth()),

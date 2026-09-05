@@ -1,0 +1,30 @@
+post:
+  summary: "Post Account Leave V1"
+  description: "Leave a shared account (MEMBER only)"
+  operationId: "PostAccountLeaveV1"
+  tags:
+    - post-account-leave-v1
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+  responses:
+    '204':
+      description: "204 No Content"
+    '403':
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '404':
+      $ref: '../es-expenses.api.yaml#/components/responses/NotFound'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

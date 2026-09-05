@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.expenses.account.mapper.AccountResponseMapper;
 import com.expenses.account.repository.AccountRepository;
 import com.expenses.api.GetAccountsV1Api;
+import com.expenses.api.dto.AccountMemberRoleV1Dto;
 import com.expenses.api.dto.GetAccountsV1ResponseDto;
 
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,15 @@ public class GetAccountsController implements GetAccountsV1Api {
                         accountEntity -> this.accountRepository.getBalance(accountEntity.getId())
                                 .setScale(2, RoundingMode.HALF_UP)
                                 .toPlainString()));
-        final var getAccountsV1ResponseDto =
-                this.accountResponseMapper.toGetAccountsV1Response(accountEntityList, balanceByAccountId);
+        final var roleByAccountId = accountEntityList.stream()
+                .collect(Collectors.toMap(
+                        accountEntity -> accountEntity.getId(),
+                        accountEntity -> AccountMemberRoleV1Dto.fromValue(
+                                this.accountRepository.getCurrentUserRole(accountEntity.getId()).name())));
+        final var getAccountsV1ResponseDto = this.accountResponseMapper.toGetAccountsV1Response(
+                accountEntityList,
+                balanceByAccountId,
+                roleByAccountId);
         return ResponseEntity.ok(getAccountsV1ResponseDto);
     }
 }

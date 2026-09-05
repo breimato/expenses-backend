@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.expenses.account.mapper.AccountResponseMapper;
 import com.expenses.account.repository.AccountRepository;
 import com.expenses.api.PatchAccountV1Api;
+import com.expenses.api.dto.AccountMemberRoleV1Dto;
 import com.expenses.api.dto.AccountV1ResponseDto;
 import com.expenses.api.dto.PatchAccountV1RequestDto;
 
@@ -34,7 +35,10 @@ public class PatchAccountController implements PatchAccountV1Api {
         final var balance = this.accountRepository.getBalance(id)
                 .setScale(2, RoundingMode.HALF_UP)
                 .toPlainString();
-        final var accountV1ResponseDto = this.accountResponseMapper.toAccountV1Response(accountEntity, balance);
+        final var accountV1ResponseDto = this.accountResponseMapper.toAccountV1Response(
+                accountEntity,
+                balance,
+                AccountMemberRoleV1Dto.OWNER);
         return ResponseEntity.ok(accountV1ResponseDto);
     }
 }

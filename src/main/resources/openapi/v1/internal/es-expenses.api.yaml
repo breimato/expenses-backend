@@ -37,6 +37,18 @@ paths:
     $ref: './expenses/accounts-v1.api.yaml'
   /v1/expenses/accounts/{id}:
     $ref: './expenses/accounts-id-v1.api.yaml'
+  /v1/expenses/accounts/{id}/invitations:
+    $ref: './expenses/accounts-id-invitations-v1.api.yaml'
+  /v1/expenses/accounts/{id}/invitations/{invitationId}:
+    $ref: './expenses/accounts-id-invitations-id-v1.api.yaml'
+  /v1/expenses/accounts/{id}/members:
+    $ref: './expenses/accounts-id-members-v1.api.yaml'
+  /v1/expenses/accounts/{id}/members/{userId}:
+    $ref: './expenses/accounts-id-members-id-v1.api.yaml'
+  /v1/expenses/accounts/{id}/leave:
+    $ref: './expenses/accounts-id-leave-v1.api.yaml'
+  /v1/expenses/invitations/{token}:
+    $ref: './expenses/invitations-token-v1.api.yaml'
   /v1/expenses/account-transfers:
     $ref: './expenses/account-transfers-v1.api.yaml'
   # Analytics
@@ -76,6 +88,14 @@ components:
       $ref: './components/ProfileV1.yaml'
     AccountV1:
       $ref: './components/AccountV1.yaml'
+    AccountMemberRoleV1:
+      $ref: './components/AccountMemberRoleV1.yaml'
+    AccountInvitationV1:
+      $ref: './components/AccountInvitationV1.yaml'
+    AccountInvitationPreviewV1:
+      $ref: './components/AccountInvitationPreviewV1.yaml'
+    AccountMemberV1:
+      $ref: './components/AccountMemberV1.yaml'
     AccountTransferV1:
       $ref: './components/AccountTransferV1.yaml'
     AnalyticsAveragesV1:
@@ -132,6 +152,12 @@ components:
       $ref: './responses/AccountV1Response.yaml'
     GetAccountsV1Response:
       $ref: './responses/GetAccountsV1Response.yaml'
+    AccountInvitationV1Response:
+      $ref: './responses/AccountInvitationV1Response.yaml'
+    AccountInvitationPreviewV1Response:
+      $ref: './responses/AccountInvitationPreviewV1Response.yaml'
+    GetAccountMembersV1Response:
+      $ref: './responses/GetAccountMembersV1Response.yaml'
     AccountTransferV1Response:
       $ref: './responses/AccountTransferV1Response.yaml'
     GetAnalyticsAveragesV1Response:

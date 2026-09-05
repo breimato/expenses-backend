@@ -61,10 +61,7 @@ public class RecurringTemplateRepository {
     public List<RecurringTemplateEntity> findAll(final Integer accountId, final Integer categoryId) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.recurringTemplateJpaMapper.findByCriteria(
-                this.currentUserService.getRequiredUserId(),
-                accountId,
-                categoryId);
+        return this.recurringTemplateJpaMapper.findByCriteria(accountId, categoryId);
     }
 
     /**
@@ -81,7 +78,7 @@ public class RecurringTemplateRepository {
 
         final var userId = this.currentUserService.getRequiredUserId();
         this.accountAccessService.requireAccountAccess(accountId);
-        this.ensureCategoryExists(accountId, postRecurringTemplateV1RequestDto.getCategoryId(), userId);
+        this.ensureCategoryExists(accountId, postRecurringTemplateV1RequestDto.getCategoryId());
         final var recurringTemplateEntity =
                 this.postRecurringTemplateRequestMapper.toRecurringTemplateEntity(postRecurringTemplateV1RequestDto);
         recurringTemplateEntity.setUserId(userId);
@@ -106,10 +103,7 @@ public class RecurringTemplateRepository {
 
         final var recurringTemplateEntity = this.findById(accountId, id);
         if (Objects.nonNull(patchRecurringTemplateV1RequestDto.getCategoryId())) {
-            this.ensureCategoryExists(
-                    accountId,
-                    patchRecurringTemplateV1RequestDto.getCategoryId(),
-                    recurringTemplateEntity.getUserId());
+            this.ensureCategoryExists(accountId, patchRecurringTemplateV1RequestDto.getCategoryId());
         }
         this.patchRecurringTemplateRequestMapper.updateRecurringTemplateEntity(
                 patchRecurringTemplateV1RequestDto,
@@ -150,7 +144,7 @@ public class RecurringTemplateRepository {
 
         this.accountAccessService.requireAccountAccess(accountId);
         return this.recurringTemplateJpaMapper
-                .findByIdAndUserIdAndAccountId(id, this.currentUserService.getRequiredUserId(), accountId)
+                .findByIdAndAccountId(id, accountId)
                 .orElseThrow(() -> new RecurringTemplateException(ExceptionMessageConstants.RECURRING_TEMPLATE_NOT_FOUND));
     }
 
@@ -194,9 +188,9 @@ public class RecurringTemplateRepository {
         }
     }
 
-    private void ensureCategoryExists(final Integer accountId, final Integer categoryId, final Integer userId) {
+    private void ensureCategoryExists(final Integer accountId, final Integer categoryId) {
 
-        if (!this.categoryRepository.existsByIdForUser(accountId, categoryId, userId)) {
+        if (!this.categoryRepository.existsById(accountId, categoryId)) {
             throw new CategoryException(ExceptionMessageConstants.CATEGORY_NOT_FOUND);
         }
     }

@@ -1,0 +1,15 @@
+description: "Account member V1"
+type: object
+properties:
+  userId:
+    type: integer
+    format: int32
+    description: "User id"
+  displayName:
+    type: string
+    description: "User display name"
+  email:
+    type: string
+    description: "User email"
+  role:
+    $ref: './AccountMemberRoleV1.yaml'

@@ -16,29 +16,25 @@ import com.expenses.expense.entity.ExpenseEntity;
 public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>, JpaSpecificationExecutor<ExpenseEntity> {
 
     /**
-     * Find by id and user id.
+     * Find by id and account id.
      *
      * @param id the id
-     * @param userId the user id
-     * @return the optional expense
-     */
-    Optional<ExpenseEntity> findByIdAndUserId(Integer id, Integer userId);
-
-    /**
-     * Find by id, user id and account id.
-     *
-     * @param id the id
-     * @param userId the user id
      * @param accountId the account id
      * @return the optional expense
      */
-    Optional<ExpenseEntity> findByIdAndUserIdAndAccountId(Integer id, Integer userId, Integer accountId);
-
-    List<ExpenseEntity> findAllByTransferIdAndUserId(Integer transferId, Integer userId);
+    Optional<ExpenseEntity> findByIdAndAccountId(Integer id, Integer accountId);
 
     /**
+     * Find all by transfer id.
      *
-     * @param userId the user id
+     * @param transferId the transfer id
+     * @return the list
+     */
+    List<ExpenseEntity> findAllByTransferId(Integer transferId);
+
+    /**
+     * Sum net spending in date range for account.
+     *
      * @param accountId the account id
      * @param dateFrom the date from
      * @param dateTo the date to
@@ -55,21 +51,18 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
                 END
             ), 0)
             FROM ExpenseEntity expenseEntity
-            WHERE expenseEntity.userId = :userId
-              AND expenseEntity.accountId = :accountId
+            WHERE expenseEntity.accountId = :accountId
               AND expenseEntity.expenseDate >= :dateFrom
               AND expenseEntity.expenseDate <= :dateTo
             """)
     BigDecimal sumNetSpendingByDateRange(
-            @Param("userId") Integer userId,
             @Param("accountId") Integer accountId,
             @Param("dateFrom") LocalDate dateFrom,
             @Param("dateTo") LocalDate dateTo);
 
     /**
-     * Sum net balance from all movements for user and account.
+     * Sum net balance from all movements for account.
      *
-     * @param userId the user id
      * @param accountId the account id
      * @return the balance
      */
@@ -84,15 +77,13 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
                 END
             ), 0)
             FROM ExpenseEntity expenseEntity
-            WHERE expenseEntity.userId = :userId
-              AND expenseEntity.accountId = :accountId
+            WHERE expenseEntity.accountId = :accountId
             """)
-    BigDecimal sumNetBalance(@Param("userId") Integer userId, @Param("accountId") Integer accountId);
+    BigDecimal sumNetBalance(@Param("accountId") Integer accountId);
 
     /**
      * Sum net balance from movements on or before the given date.
      *
-     * @param userId the user id
      * @param accountId the account id
      * @param dateTo the inclusive end date
      * @return the balance as of date
@@ -108,36 +99,29 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
                 END
             ), 0)
             FROM ExpenseEntity expenseEntity
-            WHERE expenseEntity.userId = :userId
-              AND expenseEntity.accountId = :accountId
+            WHERE expenseEntity.accountId = :accountId
               AND expenseEntity.expenseDate <= :dateTo
             """)
     BigDecimal sumNetBalanceAsOf(
-            @Param("userId") Integer userId,
             @Param("accountId") Integer accountId,
             @Param("dateTo") LocalDate dateTo);
 
     /**
-     * Find the earliest movement date for user and account.
+     * Find the earliest movement date for account.
      *
-     * @param userId the user id
      * @param accountId the account id
      * @return the optional earliest expense date
      */
     @Query("""
             SELECT MIN(expenseEntity.expenseDate)
             FROM ExpenseEntity expenseEntity
-            WHERE expenseEntity.userId = :userId
-              AND expenseEntity.accountId = :accountId
+            WHERE expenseEntity.accountId = :accountId
             """)
-    Optional<LocalDate> findMinExpenseDateByUserIdAndAccountId(
-            @Param("userId") Integer userId,
-            @Param("accountId") Integer accountId);
+    Optional<LocalDate> findMinExpenseDateByAccountId(@Param("accountId") Integer accountId);
 
     /**
-     * Find the earliest movement date for user and account within a date range.
+     * Find the earliest movement date for account within a date range.
      *
-     * @param userId the user id
      * @param accountId the account id
      * @param dateFrom the date from
      * @param dateTo the date to
@@ -146,21 +130,18 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
     @Query("""
             SELECT MIN(expenseEntity.expenseDate)
             FROM ExpenseEntity expenseEntity
-            WHERE expenseEntity.userId = :userId
-              AND expenseEntity.accountId = :accountId
+            WHERE expenseEntity.accountId = :accountId
               AND expenseEntity.expenseDate >= :dateFrom
               AND expenseEntity.expenseDate <= :dateTo
             """)
-    Optional<LocalDate> findMinExpenseDateByUserIdAndAccountIdAndExpenseDateBetween(
-            @Param("userId") Integer userId,
+    Optional<LocalDate> findMinExpenseDateByAccountIdAndExpenseDateBetween(
             @Param("accountId") Integer accountId,
             @Param("dateFrom") LocalDate dateFrom,
             @Param("dateTo") LocalDate dateTo);
 
     /**
-     * Sum expense amounts by category for user and account in date range.
+     * Sum expense amounts by category for account in date range.
      *
-     * @param userId the user id
      * @param accountId the account id
      * @param dateFrom the date from
      * @param dateTo the date to
@@ -175,8 +156,7 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
                            WHERE reimbursement.reimbursedExpenseId = expenseEntity.id
                        )), 0) AS total
             FROM ExpenseEntity expenseEntity
-            WHERE expenseEntity.userId = :userId
-              AND expenseEntity.accountId = :accountId
+            WHERE expenseEntity.accountId = :accountId
               AND expenseEntity.expenseDate >= :dateFrom
               AND expenseEntity.expenseDate <= :dateTo
               AND expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE
@@ -184,7 +164,6 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
             ORDER BY total DESC
             """)
     List<CategorySpendAggregate> sumExpenseByCategory(
-            @Param("userId") Integer userId,
             @Param("accountId") Integer accountId,
             @Param("dateFrom") LocalDate dateFrom,
             @Param("dateTo") LocalDate dateTo);

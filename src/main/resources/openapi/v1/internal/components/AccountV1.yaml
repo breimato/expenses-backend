@@ -14,3 +14,5 @@ properties:
   balance:
     type: string
     description: "Computed account balance from all recorded movements as decimal string"
+  role:
+    $ref: './AccountMemberRoleV1.yaml'

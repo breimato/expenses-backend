@@ -23,31 +23,28 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
     Optional<RecurringTemplateEntity> findByIdAndUserId(Integer id, Integer userId);
 
     /**
-     * Find by id, user id and account id.
+     * Find by id and account id.
      *
      * @param id the id
-     * @param userId the user id
      * @param accountId the account id
      * @return the optional template
      */
-    Optional<RecurringTemplateEntity> findByIdAndUserIdAndAccountId(Integer id, Integer userId, Integer accountId);
+    Optional<RecurringTemplateEntity> findByIdAndAccountId(Integer id, Integer accountId);
 
     /**
-     * Find by criteria for user.
+     * Find by criteria for account.
      *
-     * @param userId the user id
+     * @param accountId the account id
      * @param categoryId the category id
      * @return the list
      */
     @Query("""
             SELECT recurringTemplateEntity FROM RecurringTemplateEntity recurringTemplateEntity
-            WHERE recurringTemplateEntity.userId = :userId
-              AND recurringTemplateEntity.accountId = :accountId
+            WHERE recurringTemplateEntity.accountId = :accountId
               AND (:categoryId IS NULL OR recurringTemplateEntity.categoryId = :categoryId)
             ORDER BY recurringTemplateEntity.id ASC
             """)
     List<RecurringTemplateEntity> findByCriteria(
-            @Param("userId") Integer userId,
             @Param("accountId") Integer accountId,
             @Param("categoryId") Integer categoryId);
 
@@ -74,15 +71,14 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
     /**
      * Find auto-apply monthly templates pending on or before the given day (manual catch-up).
      *
-     * @param userId the user id
+     * @param accountId the account id
      * @param frequency the frequency
      * @param dayOfMonth the day of month
      * @return the list
      */
     @Query("""
             SELECT recurringTemplateEntity FROM RecurringTemplateEntity recurringTemplateEntity
-            WHERE recurringTemplateEntity.userId = :userId
-              AND recurringTemplateEntity.accountId = :accountId
+            WHERE recurringTemplateEntity.accountId = :accountId
               AND recurringTemplateEntity.enabled = true
               AND recurringTemplateEntity.autoApply = true
               AND recurringTemplateEntity.frequency = :frequency
@@ -90,8 +86,7 @@ public interface RecurringTemplateJpaMapper extends JpaRepository<RecurringTempl
               AND recurringTemplateEntity.dayOfMonth <= :dayOfMonth
             ORDER BY recurringTemplateEntity.id ASC
             """)
-    List<RecurringTemplateEntity> findPendingAutoApplyTemplatesForUser(
-            @Param("userId") Integer userId,
+    List<RecurringTemplateEntity> findPendingAutoApplyTemplatesForAccount(
             @Param("accountId") Integer accountId,
             @Param("frequency") RecurringFrequency frequency,
             @Param("dayOfMonth") int dayOfMonth);

@@ -1,6 +1,8 @@
 package com.expenses;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -511,6 +513,150 @@ class ExpensesApiIT extends IntegrationTestSupport {
 
         this.mockMvc.perform(get("/v1/expenses/accounts/" + this.accountId)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + otherToken))
+                .andExpect(status().isNotFound());
+    }
+
+    /** Test invitation links a second user as MEMBER with shared expense visibility. */
+    @Test
+    void invitationLinksMemberAndSharesExpenses() throws Exception {
+
+        this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": %d,
+                                  "amount": "33.00",
+                                  "description": "Shared joint expense",
+                                  "expenseDate": "2026-07-05",
+                                  "movementType": "EXPENSE"
+                                }
+                                """.formatted(this.expenseCategoryId)))
+                .andExpect(status().isCreated());
+
+        final MvcResult invitationResult = this.mockMvc.perform(post("/v1/expenses/accounts/" + this.accountId + "/invitations")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.invitation.token").isString())
+                .andExpect(jsonPath("$.invitation.status").value("PENDING"))
+                .andReturn();
+        final String token = this.objectMapper
+                .readTree(invitationResult.getResponse().getContentAsString())
+                .get("invitation")
+                .get("token")
+                .asText();
+
+        final var memberEmail = "member-" + System.nanoTime() + "@example.com";
+        final String memberToken = this.objectMapper
+                .readTree(this.mockMvc.perform(post("/v1/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "email": "%s",
+                                          "password": "password123",
+                                          "displayName": "Member"
+                                        }
+                                        """.formatted(memberEmail)))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString())
+                .get("accessToken")
+                .asText();
+
+        this.mockMvc.perform(get("/v1/expenses/invitations/" + token)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.invitation.status").value("PENDING"))
+                .andExpect(jsonPath("$.invitation.alreadyMember").value(false));
+
+        this.mockMvc.perform(post("/v1/expenses/invitations/" + token + "/accept")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.account.id").value(this.accountId))
+                .andExpect(jsonPath("$.account.role").value("MEMBER"));
+
+        final JsonNode memberAccounts = this.objectMapper
+                .readTree(this.mockMvc.perform(get("/v1/expenses/accounts")
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString())
+                .get("accounts");
+        var foundShared = false;
+        for (final JsonNode account : memberAccounts) {
+            if (account.get("id").asInt() == this.accountId) {
+                foundShared = true;
+                assertEquals("MEMBER", account.get("role").asText());
+            }
+        }
+        assertTrue(foundShared);
+
+        this.mockMvc.perform(get("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.expenses.length()").value(1))
+                .andExpect(jsonPath("$.expenses[0].description").value("Shared joint expense"));
+
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + this.accountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.account.balance").value("-33.00"));
+    }
+
+    /** Test MEMBER cannot invite and OWNER cannot leave. */
+    @Test
+    void memberCannotInviteAndOwnerCannotLeave() throws Exception {
+
+        final MvcResult invitationResult = this.mockMvc.perform(post("/v1/expenses/accounts/" + this.accountId + "/invitations")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isCreated())
+                .andReturn();
+        final String token = this.objectMapper
+                .readTree(invitationResult.getResponse().getContentAsString())
+                .get("invitation")
+                .get("token")
+                .asText();
+
+        final var memberEmail = "member2-" + System.nanoTime() + "@example.com";
+        final String memberToken = this.objectMapper
+                .readTree(this.mockMvc.perform(post("/v1/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "email": "%s",
+                                          "password": "password123",
+                                          "displayName": "Member Two"
+                                        }
+                                        """.formatted(memberEmail)))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString())
+                .get("accessToken")
+                .asText();
+
+        this.mockMvc.perform(post("/v1/expenses/invitations/" + token + "/accept")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(post("/v1/expenses/accounts/" + this.accountId + "/invitations")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isForbidden());
+
+        this.mockMvc.perform(post("/v1/expenses/accounts/" + this.accountId + "/leave")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isForbidden());
+
+        this.mockMvc.perform(post("/v1/expenses/accounts/" + this.accountId + "/leave")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
+                .andExpect(status().isNoContent());
+
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + this.accountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
                 .andExpect(status().isNotFound());
     }
 }

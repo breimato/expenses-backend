@@ -1,0 +1,28 @@
+get:
+  summary: "Get Account Members V1"
+  description: "List members of an account"
+  operationId: "GetAccountMembersV1"
+  tags:
+    - get-account-members-v1
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+  responses:
+    '200':
+      description: "200 OK"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/GetAccountMembersV1Response.yaml'
+    '404':
+      $ref: '../es-expenses.api.yaml#/components/responses/NotFound'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

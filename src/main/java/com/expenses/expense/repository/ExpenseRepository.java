@@ -82,7 +82,6 @@ public class ExpenseRepository {
 
         this.accountAccessService.requireAccountAccess(accountId);
         return this.expenseJpaMapper.findAll(ExpenseSpecification.withFilters(
-                this.currentUserService.getRequiredUserId(),
                 accountId,
                 categoryId,
                 expenseDate,
@@ -118,7 +117,7 @@ public class ExpenseRepository {
             final Integer userId) {
 
         final var movementType = this.enumMapper.toMovementType(postExpenseV1RequestDto.getMovementType());
-        this.ensureCategoryMatchesMovement(accountId, postExpenseV1RequestDto.getCategoryId(), movementType, userId);
+        this.ensureCategoryMatchesMovement(accountId, postExpenseV1RequestDto.getCategoryId(), movementType);
         final var expenseEntity = this.postExpenseRequestMapper.toExpenseEntity(postExpenseV1RequestDto);
         expenseEntity.setUserId(userId);
         expenseEntity.setAccountId(accountId);
@@ -132,7 +131,6 @@ public class ExpenseRepository {
                 expenseEntity,
                 movementType,
                 accountId,
-                userId,
                 this.unwrapInteger(postExpenseV1RequestDto.getReimbursedExpenseId()));
         return this.expenseJpaMapper.save(expenseEntity);
     }
@@ -162,14 +160,12 @@ public class ExpenseRepository {
             this.ensureCategoryMatchesMovement(
                     accountId,
                     patchExpenseV1RequestDto.getCategoryId(),
-                    movementType,
-                    expenseEntity.getUserId());
+                    movementType);
         } else if (Objects.nonNull(patchExpenseV1RequestDto.getMovementType())) {
             this.ensureCategoryMatchesMovement(
                     accountId,
                     expenseEntity.getCategoryId(),
-                    this.enumMapper.toMovementType(patchExpenseV1RequestDto.getMovementType()),
-                    expenseEntity.getUserId());
+                    this.enumMapper.toMovementType(patchExpenseV1RequestDto.getMovementType()));
         }
         this.patchExpenseRequestMapper.updateExpenseEntity(patchExpenseV1RequestDto, expenseEntity);
         if (Objects.nonNull(patchExpenseV1RequestDto.getMovementType())) {
@@ -181,7 +177,6 @@ public class ExpenseRepository {
                     expenseEntity,
                     expenseEntity.getMovementType(),
                     accountId,
-                    expenseEntity.getUserId(),
                     patchExpenseV1RequestDto.getReimbursedExpenseId().get());
         } else if (expenseEntity.getMovementType() != MovementType.INCOME) {
             expenseEntity.setReimbursedExpenseId(null);
@@ -218,10 +213,7 @@ public class ExpenseRepository {
     public ExpenseEntity findById(final Integer accountId, final Integer id) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.findByIdAndUserIdAndAccountId(
-                        id,
-                        this.currentUserService.getRequiredUserId(),
-                        accountId)
+        return this.expenseJpaMapper.findByIdAndAccountId(id, accountId)
                 .orElseThrow(() -> new ExpenseException(ExceptionMessageConstants.EXPENSE_NOT_FOUND));
     }
 
@@ -229,17 +221,13 @@ public class ExpenseRepository {
             final ExpenseEntity expenseEntity,
             final MovementType movementType,
             final Integer accountId,
-            final Integer userId,
             final Integer reimbursedExpenseId) {
 
         if (movementType != MovementType.INCOME || Objects.isNull(reimbursedExpenseId)) {
             expenseEntity.setReimbursedExpenseId(null);
             return;
         }
-        final var reimbursedExpenseEntity = this.expenseJpaMapper.findByIdAndUserIdAndAccountId(
-                        reimbursedExpenseId,
-                        userId,
-                        accountId)
+        final var reimbursedExpenseEntity = this.expenseJpaMapper.findByIdAndAccountId(reimbursedExpenseId, accountId)
                 .orElseThrow(() -> new ExpenseException(ExceptionMessageConstants.EXPENSE_REIMBURSED_NOT_FOUND));
         if (reimbursedExpenseEntity.getMovementType() != MovementType.EXPENSE) {
             throw new ExpenseException(
@@ -261,13 +249,12 @@ public class ExpenseRepository {
     private void ensureCategoryMatchesMovement(
             final Integer accountId,
             final Integer categoryId,
-            final MovementType movementType,
-            final Integer userId) {
+            final MovementType movementType) {
 
-        if (!this.categoryRepository.existsByIdForUser(accountId, categoryId, userId)) {
+        if (!this.categoryRepository.existsById(accountId, categoryId)) {
             throw new CategoryException(ExceptionMessageConstants.CATEGORY_NOT_FOUND);
         }
-        final var categoryEntity = this.categoryRepository.findByIdForUser(accountId, categoryId, userId);
+        final var categoryEntity = this.categoryRepository.findById(accountId, categoryId);
         if (categoryEntity.getMovementType() != movementType) {
             throw new CategoryException(ExceptionMessageConstants.CATEGORY_MOVEMENT_TYPE_MISMATCH);
         }
@@ -299,9 +286,7 @@ public class ExpenseRepository {
         if (Objects.isNull(expenseEntity.getTransferId())) {
             return savedExpenseEntity;
         }
-        final var linkedLegs = this.expenseJpaMapper.findAllByTransferIdAndUserId(
-                expenseEntity.getTransferId(),
-                expenseEntity.getUserId());
+        final var linkedLegs = this.expenseJpaMapper.findAllByTransferId(expenseEntity.getTransferId());
         for (final var linkedLeg : linkedLegs) {
             if (Objects.equals(linkedLeg.getId(), expenseEntity.getId())) {
                 continue;
@@ -322,9 +307,7 @@ public class ExpenseRepository {
 
     private void deleteTransfer(final ExpenseEntity expenseEntity) {
 
-        final var linkedLegs = this.expenseJpaMapper.findAllByTransferIdAndUserId(
-                expenseEntity.getTransferId(),
-                expenseEntity.getUserId());
+        final var linkedLegs = this.expenseJpaMapper.findAllByTransferId(expenseEntity.getTransferId());
         for (final var linkedLeg : linkedLegs) {
             this.recurringApplicationJpaMapper.deleteByMovementId(linkedLeg.getId());
             this.expenseJpaMapper.delete(linkedLeg);

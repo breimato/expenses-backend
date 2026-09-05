@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.expenses.account.mapper.AccountResponseMapper;
 import com.expenses.account.repository.AccountRepository;
 import com.expenses.api.PostAccountV1Api;
+import com.expenses.api.dto.AccountMemberRoleV1Dto;
 import com.expenses.api.dto.AccountV1ResponseDto;
 import com.expenses.api.dto.PostAccountV1RequestDto;
 
@@ -33,7 +34,10 @@ public class PostAccountController implements PostAccountV1Api {
         final var balance = this.accountRepository.getBalance(accountEntity.getId())
                 .setScale(2, RoundingMode.HALF_UP)
                 .toPlainString();
-        final var accountV1ResponseDto = this.accountResponseMapper.toAccountV1Response(accountEntity, balance);
+        final var accountV1ResponseDto = this.accountResponseMapper.toAccountV1Response(
+                accountEntity,
+                balance,
+                AccountMemberRoleV1Dto.OWNER);
         return ResponseEntity.status(HttpStatus.CREATED).body(accountV1ResponseDto);
     }
 }

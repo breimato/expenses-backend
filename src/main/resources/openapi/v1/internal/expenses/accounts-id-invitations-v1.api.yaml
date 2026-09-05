@@ -1,0 +1,34 @@
+post:
+  summary: "Post Account Invitation V1"
+  description: "Create an invitation link for an account (OWNER only)"
+  operationId: "PostAccountInvitationV1"
+  tags:
+    - post-account-invitation-v1
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+  responses:
+    '201':
+      description: "201 Created"
+      content:
+        application/json:
+          schema:
+            $ref: '../responses/AccountInvitationV1Response.yaml'
+    '403':
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '404':
+      $ref: '../es-expenses.api.yaml#/components/responses/NotFound'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

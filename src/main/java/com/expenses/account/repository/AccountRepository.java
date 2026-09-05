@@ -7,7 +7,9 @@ import java.util.Objects;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.expenses.account.AccountMemberRole;
 import com.expenses.account.entity.AccountEntity;
+import com.expenses.account.entity.AccountMemberEntity;
 import com.expenses.account.service.AccountAccessService;
 import com.expenses.api.dto.PatchAccountV1RequestDto;
 import com.expenses.api.dto.PostAccountV1RequestDto;
@@ -24,6 +26,9 @@ public class AccountRepository {
 
     /** The account jpa mapper. */
     private final AccountJpaMapper accountJpaMapper;
+
+    /** The account member jpa mapper. */
+    private final AccountMemberJpaMapper accountMemberJpaMapper;
 
     /** The expense jpa mapper. */
     private final ExpenseJpaMapper expenseJpaMapper;
@@ -45,7 +50,7 @@ public class AccountRepository {
     @Transactional(readOnly = true)
     public List<AccountEntity> findAllForCurrentUser() {
 
-        return this.accountJpaMapper.findByUserIdOrderByIsDefaultDescNameAsc(
+        return this.accountMemberJpaMapper.findAccessibleAccountsByUserId(
                 this.currentUserService.getRequiredUserId());
     }
 
@@ -76,6 +81,7 @@ public class AccountRepository {
         accountEntity.setName(displayName);
         accountEntity.setDefault(true);
         final var savedAccountEntity = this.accountJpaMapper.save(accountEntity);
+        this.createOwnerMembership(savedAccountEntity.getId(), userId);
         this.categorySeedService.seedDefaultCategories(userId, savedAccountEntity.getId());
         return savedAccountEntity;
     }
@@ -95,12 +101,13 @@ public class AccountRepository {
         accountEntity.setName(postAccountV1RequestDto.getName().trim());
         accountEntity.setDefault(false);
         final var savedAccountEntity = this.accountJpaMapper.save(accountEntity);
+        this.createOwnerMembership(savedAccountEntity.getId(), userId);
         this.categorySeedService.seedDefaultCategories(userId, savedAccountEntity.getId());
         return savedAccountEntity;
     }
 
     /**
-     * Update account for current user.
+     * Update account for current user (OWNER only).
      *
      * @param accountId the account id
      * @param patchAccountV1RequestDto the patch account v1 request dto
@@ -109,7 +116,7 @@ public class AccountRepository {
     @Transactional
     public AccountEntity update(final Integer accountId, final PatchAccountV1RequestDto patchAccountV1RequestDto) {
 
-        final var accountEntity = this.accountAccessService.requireAccountAccess(accountId);
+        final var accountEntity = this.accountAccessService.requireOwner(accountId);
         if (Objects.nonNull(patchAccountV1RequestDto.getName())) {
             accountEntity.setName(patchAccountV1RequestDto.getName().trim());
         }
@@ -126,8 +133,27 @@ public class AccountRepository {
     public BigDecimal getBalance(final Integer accountId) {
 
         this.accountAccessService.requireAccountAccess(accountId);
-        return this.expenseJpaMapper.sumNetBalance(
-                this.currentUserService.getRequiredUserId(),
-                accountId);
+        return this.expenseJpaMapper.sumNetBalance(accountId);
+    }
+
+    /**
+     * Get current user role for account.
+     *
+     * @param accountId the account id
+     * @return the role
+     */
+    @Transactional(readOnly = true)
+    public AccountMemberRole getCurrentUserRole(final Integer accountId) {
+
+        return this.accountAccessService.getCurrentUserRole(accountId);
+    }
+
+    private void createOwnerMembership(final Integer accountId, final Integer userId) {
+
+        final var accountMemberEntity = new AccountMemberEntity();
+        accountMemberEntity.setAccountId(accountId);
+        accountMemberEntity.setUserId(userId);
+        accountMemberEntity.setRole(AccountMemberRole.OWNER);
+        this.accountMemberJpaMapper.save(accountMemberEntity);
     }
 }

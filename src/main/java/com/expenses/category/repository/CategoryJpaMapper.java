@@ -22,6 +22,15 @@ public interface CategoryJpaMapper extends JpaRepository<CategoryEntity, Integer
     Optional<CategoryEntity> findByIdAndUserId(Integer id, Integer userId);
 
     /**
+     * Find by id and account id.
+     *
+     * @param id the id
+     * @param accountId the account id
+     * @return the optional category
+     */
+    Optional<CategoryEntity> findByIdAndAccountId(Integer id, Integer accountId);
+
+    /**
      * Find by id, user id and account id.
      *
      * @param id the id

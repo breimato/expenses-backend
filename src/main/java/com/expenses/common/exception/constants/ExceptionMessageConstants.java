@@ -53,6 +53,34 @@ public final class ExceptionMessageConstants {
     public static final String ACCOUNT_TRANSFER_CATEGORY_MISSING =
             "EXP-ACCOUNT-004 | No se encontró categoría de transferencia en la cuenta";
 
+    /** The Constant ACCOUNT_FORBIDDEN. */
+    public static final String ACCOUNT_FORBIDDEN =
+            "EXP-ACCOUNT-005 | No tienes permisos para esta operación en la cuenta";
+
+    /** The Constant ACCOUNT_INVITATION_NOT_FOUND. */
+    public static final String ACCOUNT_INVITATION_NOT_FOUND =
+            "EXP-ACCOUNT-006 | No se encontró la invitación";
+
+    /** The Constant ACCOUNT_INVITATION_INVALID. */
+    public static final String ACCOUNT_INVITATION_INVALID =
+            "EXP-ACCOUNT-007 | La invitación no es válida o ya no está disponible";
+
+    /** The Constant ACCOUNT_INVITATION_ALREADY_MEMBER. */
+    public static final String ACCOUNT_INVITATION_ALREADY_MEMBER =
+            "EXP-ACCOUNT-008 | Ya eres miembro de esta cuenta";
+
+    /** The Constant ACCOUNT_MEMBER_NOT_FOUND. */
+    public static final String ACCOUNT_MEMBER_NOT_FOUND =
+            "EXP-ACCOUNT-009 | No se encontró el miembro de la cuenta";
+
+    /** The Constant ACCOUNT_CANNOT_REMOVE_OWNER. */
+    public static final String ACCOUNT_CANNOT_REMOVE_OWNER =
+            "EXP-ACCOUNT-010 | No se puede eliminar al propietario de la cuenta";
+
+    /** The Constant ACCOUNT_OWNER_CANNOT_LEAVE. */
+    public static final String ACCOUNT_OWNER_CANNOT_LEAVE =
+            "EXP-ACCOUNT-011 | El propietario no puede abandonar la cuenta";
+
     /** The Constant AUTH_EMAIL_ALREADY_EXISTS. */
     public static final String AUTH_EMAIL_ALREADY_EXISTS = "EXP-AUTH-001 | Ya existe un usuario con ese email";
 

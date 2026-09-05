@@ -3,6 +3,7 @@ package com.expenses.expense.repository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -20,7 +21,7 @@ public final class ExpenseSpecification {
     /**
      * Build specification for optional expense filters.
      *
-     * @param userId the user id
+     * @param accountId the account id
      * @param categoryId the category id
      * @param expenseDate the expense date
      * @param description the description
@@ -28,7 +29,6 @@ public final class ExpenseSpecification {
      * @return the specification
      */
     public static Specification<ExpenseEntity> withFilters(
-            final Integer userId,
             final Integer accountId,
             final Integer categoryId,
             final LocalDate expenseDate,
@@ -37,20 +37,19 @@ public final class ExpenseSpecification {
 
         return (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
             predicates.add(criteriaBuilder.equal(root.get("accountId"), accountId));
-            if (categoryId != null) {
+            if (Objects.nonNull(categoryId)) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryId"), categoryId));
             }
-            if (expenseDate != null) {
+            if (Objects.nonNull(expenseDate)) {
                 predicates.add(criteriaBuilder.equal(root.get("expenseDate"), expenseDate));
             }
-            if (description != null && !description.isBlank()) {
+            if (Objects.nonNull(description) && !description.isBlank()) {
                 predicates.add(criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("description")),
                         "%" + description.toLowerCase() + "%"));
             }
-            if (movementType != null) {
+            if (Objects.nonNull(movementType)) {
                 predicates.add(criteriaBuilder.equal(root.get("movementType"), movementType));
             }
             query.orderBy(

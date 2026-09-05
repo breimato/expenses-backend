@@ -1,0 +1,5 @@
+description: "Account invitation V1 response"
+type: object
+properties:
+  invitation:
+    $ref: '../components/AccountInvitationV1.yaml'
