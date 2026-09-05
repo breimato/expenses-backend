@@ -159,7 +159,10 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
             WHERE expenseEntity.accountId = :accountId
               AND expenseEntity.expenseDate >= :dateFrom
               AND expenseEntity.expenseDate <= :dateTo
-              AND expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE
+              AND expenseEntity.movementType IN (
+                  com.expenses.common.MovementType.EXPENSE,
+                  com.expenses.common.MovementType.TRANSFER_OUT
+              )
             GROUP BY expenseEntity.categoryId
             ORDER BY total DESC
             """)
