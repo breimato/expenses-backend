@@ -204,6 +204,58 @@ class AnalyticsServiceTest {
         assertEquals(1, analyticsPeriodAverageResult.daysInPeriod());
     }
 
+    /** Test compute period average when excluded category ids are null then uses full range query. */
+    @Test
+    void testComputePeriodAverage_whenExcludedCategoryIdsNull_thenUsesFullRangeQuery() {
+
+        // Given
+        final var dateFrom = LocalDate.of(2026, 8, 1);
+        final var dateTo = LocalDate.of(2026, 8, 10);
+        when(this.analyticsRepository.sumNetSpendingByDateRange(ACCOUNT_ID, dateFrom, dateTo))
+                .thenReturn(new BigDecimal("100.00"));
+
+        // When
+        final var analyticsPeriodAverageResult =
+                this.analyticsService.computePeriodAverage(ACCOUNT_ID, dateFrom, dateTo, null);
+
+        // Then
+        verify(this.analyticsRepository, times(1)).sumNetSpendingByDateRange(ACCOUNT_ID, dateFrom, dateTo);
+        assertEquals(new BigDecimal("10.00"), analyticsPeriodAverageResult.dailyAverage());
+    }
+
+    /** Test compute period average when categories excluded then uses excluding query. */
+    @Test
+    void testComputePeriodAverage_whenCategoriesExcluded_thenUsesExcludingQuery() {
+
+        // Given
+        final var dateFrom = LocalDate.of(2026, 8, 1);
+        final var dateTo = LocalDate.of(2026, 8, 10);
+        final var excludedCategoryIds = List.of(3);
+        when(this.analyticsRepository.sumNetSpendingByDateRangeExcludingCategories(
+                ACCOUNT_ID,
+                dateFrom,
+                dateTo,
+                excludedCategoryIds))
+                .thenReturn(new BigDecimal("80.00"));
+
+        // When
+        final var analyticsPeriodAverageResult = this.analyticsService.computePeriodAverage(
+                ACCOUNT_ID,
+                dateFrom,
+                dateTo,
+                excludedCategoryIds);
+
+        // Then
+        verify(this.analyticsRepository, times(1)).sumNetSpendingByDateRangeExcludingCategories(
+                ACCOUNT_ID,
+                dateFrom,
+                dateTo,
+                excludedCategoryIds);
+        assertEquals(new BigDecimal("8.00"), analyticsPeriodAverageResult.dailyAverage());
+        assertEquals(new BigDecimal("80.00"), analyticsPeriodAverageResult.totalNetSpending());
+        assertEquals(10, analyticsPeriodAverageResult.daysInPeriod());
+    }
+
     /** Test compute period average when dateFrom after dateTo then bad request. */
     @Test
     void testComputePeriodAverage_whenDateFromAfterDateTo_thenThrowsBadRequest() {

@@ -81,12 +81,28 @@ public class AnalyticsService {
             final LocalDate dateFrom,
             final LocalDate dateTo) {
 
+        return this.computePeriodAverage(accountId, dateFrom, dateTo, List.of());
+    }
+
+    /**
+     * Compute daily average net spending for an inclusive date range.
+     *
+     * @param dateFrom the inclusive start date
+     * @param dateTo the inclusive end date
+     * @param excludedCategoryIds the category ids to exclude
+     * @return the analytics period average result
+     */
+    @Transactional(readOnly = true)
+    public AnalyticsPeriodAverageResult computePeriodAverage(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo,
+            final List<Integer> excludedCategoryIds) {
+
         if (Objects.isNull(dateFrom) || Objects.isNull(dateTo) || dateFrom.isAfter(dateTo)) {
             throw new ExpenseException(ExceptionMessageConstants.ANALYTICS_INVALID_DATE_RANGE, HttpStatus.BAD_REQUEST);
         }
-        final var totalNetSpending = Objects.requireNonNullElse(
-                this.analyticsRepository.sumNetSpendingByDateRange(accountId, dateFrom, dateTo),
-                BigDecimal.ZERO);
+        final var totalNetSpending = this.resolvePeriodNetSpending(accountId, dateFrom, dateTo, excludedCategoryIds);
         final var daysInPeriod = this.countInclusiveDays(dateFrom, dateTo);
         return AnalyticsPeriodAverageResult.builder()
                 .dailyAverage(this.divide(totalNetSpending, daysInPeriod))
@@ -95,6 +111,35 @@ public class AnalyticsService {
                 .dateFrom(dateFrom)
                 .dateTo(dateTo)
                 .build();
+    }
+
+    /**
+     * Resolve period net spending, optionally excluding categories.
+     *
+     * @param accountId the account id
+     * @param dateFrom the inclusive start date
+     * @param dateTo the inclusive end date
+     * @param excludedCategoryIds the category ids to exclude
+     * @return the total net spending
+     */
+    private BigDecimal resolvePeriodNetSpending(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo,
+            final List<Integer> excludedCategoryIds) {
+
+        if (Objects.isNull(excludedCategoryIds) || excludedCategoryIds.isEmpty()) {
+            return Objects.requireNonNullElse(
+                    this.analyticsRepository.sumNetSpendingByDateRange(accountId, dateFrom, dateTo),
+                    BigDecimal.ZERO);
+        }
+        return Objects.requireNonNullElse(
+                this.analyticsRepository.sumNetSpendingByDateRangeExcludingCategories(
+                        accountId,
+                        dateFrom,
+                        dateTo,
+                        excludedCategoryIds),
+                BigDecimal.ZERO);
     }
 
     /**

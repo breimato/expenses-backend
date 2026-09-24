@@ -64,6 +64,30 @@ public class AnalyticsRepository {
     }
 
     /**
+     * Sum net spending in the given date range excluding categories.
+     *
+     * @param accountId the account id
+     * @param dateFrom the date from
+     * @param dateTo the date to
+     * @param excludedCategoryIds the excluded category ids
+     * @return the sum
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal sumNetSpendingByDateRangeExcludingCategories(
+            final Integer accountId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo,
+            final List<Integer> excludedCategoryIds) {
+
+        this.accountAccessService.requireAccountAccess(accountId);
+        return this.expenseJpaMapper.sumNetSpendingByDateRangeExcludingCategories(
+                accountId,
+                dateFrom,
+                dateTo,
+                excludedCategoryIds);
+    }
+
+    /**
      * Find earliest movement date for the current user and account.
      *
      * @param accountId the account id

@@ -17,3 +17,9 @@ properties:
     type: string
     format: date
     description: "Inclusive end date of the average period"
+  excludedCategoryIds:
+    type: array
+    items:
+      type: integer
+      format: int32
+    description: "Category ids whose movements are excluded from the period average"

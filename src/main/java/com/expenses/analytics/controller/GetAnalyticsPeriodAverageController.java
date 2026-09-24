@@ -30,7 +30,8 @@ public class GetAnalyticsPeriodAverageController implements GetAnalyticsPeriodAv
         final var analyticsPeriodAverageResult = this.analyticsService.computePeriodAverage(
                 getAnalyticsPeriodAverageV1RequestDto.getAccountId(),
                 getAnalyticsPeriodAverageV1RequestDto.getDateFrom(),
-                getAnalyticsPeriodAverageV1RequestDto.getDateTo());
+                getAnalyticsPeriodAverageV1RequestDto.getDateTo(),
+                getAnalyticsPeriodAverageV1RequestDto.getExcludedCategoryIds());
         final var getAnalyticsPeriodAverageV1ResponseDto =
                 this.analyticsResponseMapper.toGetAnalyticsPeriodAverageV1Response(analyticsPeriodAverageResult);
         return ResponseEntity.ok(getAnalyticsPeriodAverageV1ResponseDto);

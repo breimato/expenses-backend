@@ -212,6 +212,107 @@ class ExpensesApiIT extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.analyticsProjections").exists());
     }
 
+    /** Test period average excluding expense category also drops linked reimbursement. */
+    @Test
+    void periodAverageExcludingCategoryDropsLinkedReimbursement() throws Exception {
+
+        Integer keptExpenseCategoryId = null;
+        final MvcResult categoriesResult = this.mockMvc.perform(get("/v1/expenses/categories")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        for (final JsonNode category : this.objectMapper
+                .readTree(categoriesResult.getResponse().getContentAsString())
+                .get("categories")) {
+            if ("EXPENSE".equals(category.get("movementType").asText())
+                    && category.get("id").asInt() != this.expenseCategoryId) {
+                keptExpenseCategoryId = category.get("id").asInt();
+                break;
+            }
+        }
+
+        final MvcResult createExpenseResult = this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": %d,
+                                  "amount": "50.00",
+                                  "description": "Comida",
+                                  "expenseDate": "2026-07-05",
+                                  "movementType": "EXPENSE"
+                                }
+                                """.formatted(this.expenseCategoryId)))
+                .andExpect(status().isCreated())
+                .andReturn();
+        final int expenseId = this.objectMapper
+                .readTree(createExpenseResult.getResponse().getContentAsString())
+                .get("expense")
+                .get("id")
+                .asInt();
+
+        this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": %d,
+                                  "amount": "50.00",
+                                  "description": "Bizum comida",
+                                  "expenseDate": "2026-07-06",
+                                  "movementType": "INCOME",
+                                  "reimbursedExpenseId": %d
+                                }
+                                """.formatted(this.incomeCategoryId, expenseId)))
+                .andExpect(status().isCreated());
+
+        this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(this.accountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": %d,
+                                  "amount": "30.00",
+                                  "description": "Transporte",
+                                  "expenseDate": "2026-07-07",
+                                  "movementType": "EXPENSE"
+                                }
+                                """.formatted(keptExpenseCategoryId)))
+                .andExpect(status().isCreated());
+
+        this.mockMvc.perform(post("/v1/expenses/analytics/period-average")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "accountId": %d,
+                                  "dateFrom": "2026-07-01",
+                                  "dateTo": "2026-07-10"
+                                }
+                                """.formatted(this.accountId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.analyticsPeriodAverage.totalNetSpending").value("30.00"));
+
+        this.mockMvc.perform(post("/v1/expenses/analytics/period-average")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "accountId": %d,
+                                  "dateFrom": "2026-07-01",
+                                  "dateTo": "2026-07-10",
+                                  "excludedCategoryIds": [%d]
+                                }
+                                """.formatted(this.accountId, this.expenseCategoryId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.analyticsPeriodAverage.totalNetSpending").value("30.00"))
+                .andExpect(jsonPath("$.analyticsPeriodAverage.dailyAverage").value("3.00"));
+    }
+
     /** Test expense excluded from averages can be created with the flag. */
     @Test
     void createExpenseExcludedFromAveragePersistsFlag() throws Exception {

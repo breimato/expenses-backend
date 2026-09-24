@@ -61,6 +61,48 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
             @Param("dateTo") LocalDate dateTo);
 
     /**
+     * Sum net spending in date range for account excluding categories.
+     *
+     * @param accountId the account id
+     * @param dateFrom the date from
+     * @param dateTo the date to
+     * @param excludedCategoryIds the excluded category ids
+     * @return the sum
+     */
+    @Query("""
+            SELECT COALESCE(SUM(
+                CASE
+                    WHEN expenseEntity.movementType = com.expenses.common.MovementType.EXPENSE
+                         AND expenseEntity.offsetsSpendingAverage = false
+                         AND expenseEntity.categoryId NOT IN :excludedCategoryIds
+                        THEN expenseEntity.amount
+                    WHEN expenseEntity.movementType = com.expenses.common.MovementType.INCOME
+                         AND expenseEntity.offsetsSpendingAverage = true
+                         AND COALESCE(
+                             (
+                                 SELECT reimbursedExpenseEntity.categoryId
+                                 FROM ExpenseEntity reimbursedExpenseEntity
+                                 WHERE reimbursedExpenseEntity.id = expenseEntity.reimbursedExpenseId
+                                   AND reimbursedExpenseEntity.accountId = expenseEntity.accountId
+                             ),
+                             expenseEntity.categoryId
+                         ) NOT IN :excludedCategoryIds
+                        THEN -expenseEntity.amount
+                    ELSE 0
+                END
+            ), 0)
+            FROM ExpenseEntity expenseEntity
+            WHERE expenseEntity.accountId = :accountId
+              AND expenseEntity.expenseDate >= :dateFrom
+              AND expenseEntity.expenseDate <= :dateTo
+            """)
+    BigDecimal sumNetSpendingByDateRangeExcludingCategories(
+            @Param("accountId") Integer accountId,
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("excludedCategoryIds") List<Integer> excludedCategoryIds);
+
+    /**
      * Sum net balance from all movements for account.
      *
      * @param accountId the account id
