@@ -62,7 +62,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "La imagen ya está actualizada"
           else
-            git commit -m "Deploy Library $GITHUB_SHA"
+            git commit -m "Deploy Expenses $GITHUB_SHA"
             git push
           fi
 
