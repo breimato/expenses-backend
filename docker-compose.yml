@@ -1,0 +1,37 @@
+services:
+  # Optional: only if you prefer Docker for Postgres.
+  # Native install is the default for local/prod-on-PC (port 5432).
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: expenses-postgres
+    environment:
+      POSTGRES_DB: expenses_db
+      POSTGRES_USER: expenses_user
+      POSTGRES_PASSWORD: expenses_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - expenses_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U expenses_user -d expenses_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: expenses-app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: expenses_db
+      DB_USERNAME: expenses_user
+      DB_PASSWORD: expenses_pass
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  expenses_pg_data:
