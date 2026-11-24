@@ -760,4 +760,73 @@ class ExpensesApiIT extends IntegrationTestSupport {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + memberToken))
                 .andExpect(status().isNotFound());
     }
+
+    /** Test delete account removes the account with all its data. */
+    @Test
+    void deleteAccountRemovesAccountAndData() throws Exception {
+
+        final MvcResult createdAccountResult = this.mockMvc.perform(post("/v1/expenses/accounts")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Cuenta temporal"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        final int temporalAccountId = this.objectMapper
+                .readTree(createdAccountResult.getResponse().getContentAsString())
+                .get("account")
+                .get("id")
+                .asInt();
+
+        final MvcResult temporalCategoriesResult = this.mockMvc.perform(get("/v1/expenses/categories")
+                        .param("accountId", String.valueOf(temporalAccountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        final JsonNode temporalCategories = this.objectMapper
+                .readTree(temporalCategoriesResult.getResponse().getContentAsString())
+                .get("categories");
+        int temporalExpenseCategoryId = 0;
+        for (final JsonNode category : temporalCategories) {
+            if ("EXPENSE".equals(category.get("movementType").asText())) {
+                temporalExpenseCategoryId = category.get("id").asInt();
+                break;
+            }
+        }
+
+        this.mockMvc.perform(post("/v1/expenses/expenses")
+                        .param("accountId", String.valueOf(temporalAccountId))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "categoryId": %d,
+                                  "amount": "10.00",
+                                  "description": "Gasto en cuenta temporal",
+                                  "expenseDate": "2026-07-10",
+                                  "movementType": "EXPENSE"
+                                }
+                                """.formatted(temporalExpenseCategoryId)))
+                .andExpect(status().isCreated());
+
+        this.mockMvc.perform(delete("/v1/expenses/accounts/" + temporalAccountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isNoContent());
+
+        this.mockMvc.perform(get("/v1/expenses/accounts/" + temporalAccountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isNotFound());
+    }
+
+    /** Test default account cannot be deleted. */
+    @Test
+    void deleteDefaultAccountReturnsConflict() throws Exception {
+
+        this.mockMvc.perform(delete("/v1/expenses/accounts/" + this.accountId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + this.accessToken))
+                .andExpect(status().isConflict());
+    }
 }

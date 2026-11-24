@@ -60,3 +60,39 @@ patch:
         application/json:
           schema:
             $ref: '../components/ApiErrorV1.yaml'
+delete:
+  summary: "Delete Account V1"
+  description: "Delete an account with all its movements, categories, templates and transfers"
+  operationId: "DeleteAccountV1"
+  tags:
+    - delete-account-v1
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int32
+  responses:
+    '204':
+      description: "204 No Content"
+    '403':
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '404':
+      $ref: '../es-expenses.api.yaml#/components/responses/NotFound'
+    '409':
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'
+    '500':
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ApiErrorV1.yaml'

@@ -78,6 +78,10 @@ public final class ExceptionMessageConstants {
             "EXP-ACCOUNT-010 | No se puede eliminar al propietario de la cuenta";
 
     /** The Constant ACCOUNT_OWNER_CANNOT_LEAVE. */
+    /** The Constant ACCOUNT_DEFAULT_CANNOT_DELETE. */
+    public static final String ACCOUNT_DEFAULT_CANNOT_DELETE =
+            "EXP-ACCOUNT-012 | No se puede eliminar la cuenta principal. Cambia la cuenta principal antes de borrarla";
+
     public static final String ACCOUNT_OWNER_CANNOT_LEAVE =
             "EXP-ACCOUNT-011 | El propietario no puede abandonar la cuenta";
 

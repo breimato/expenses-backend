@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -212,6 +213,16 @@ public interface ExpenseJpaMapper extends JpaRepository<ExpenseEntity, Integer>,
             @Param("accountId") Integer accountId,
             @Param("dateFrom") LocalDate dateFrom,
             @Param("dateTo") LocalDate dateTo);
+
+    /**
+     * Delete all expenses for account.
+     *
+     * @param accountId the account id
+     * @return the deleted count
+     */
+    @Modifying
+    @Query("DELETE FROM ExpenseEntity expenseEntity WHERE expenseEntity.accountId = :accountId")
+    int deleteAllByAccountId(@Param("accountId") Integer accountId);
 
     /**
      * Check if any expense exists for category.

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,8 @@ import com.expenses.api.dto.PatchAccountV1RequestDto;
 import com.expenses.api.dto.PostAccountV1RequestDto;
 import com.expenses.auth.service.CurrentUserService;
 import com.expenses.category.service.CategorySeedService;
+import com.expenses.common.exception.AccountException;
+import com.expenses.common.exception.constants.ExceptionMessageConstants;
 import com.expenses.expense.repository.ExpenseJpaMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,9 @@ public class AccountRepository {
 
     /** The account member jpa mapper. */
     private final AccountMemberJpaMapper accountMemberJpaMapper;
+
+    /** The account transfer jpa mapper. */
+    private final AccountTransferJpaMapper accountTransferJpaMapper;
 
     /** The expense jpa mapper. */
     private final ExpenseJpaMapper expenseJpaMapper;
@@ -104,6 +110,23 @@ public class AccountRepository {
         this.createOwnerMembership(savedAccountEntity.getId(), userId);
         this.categorySeedService.seedDefaultCategories(userId, savedAccountEntity.getId());
         return savedAccountEntity;
+    }
+
+    /**
+     * Delete account with all its data for current user (OWNER only).
+     *
+     * @param accountId the account id
+     */
+    @Transactional
+    public void delete(final Integer accountId) {
+
+        final var accountEntity = this.accountAccessService.requireOwner(accountId);
+        if (accountEntity.isDefault()) {
+            throw new AccountException(ExceptionMessageConstants.ACCOUNT_DEFAULT_CANNOT_DELETE, HttpStatus.CONFLICT);
+        }
+        this.accountTransferJpaMapper.deleteAllByAccountId(accountId);
+        this.expenseJpaMapper.deleteAllByAccountId(accountId);
+        this.accountJpaMapper.delete(accountEntity);
     }
 
     /**
